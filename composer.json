@@ -9,6 +9,16 @@
 			"email": "dev@message.co.uk"
 		}
 	],
+	"support": {
+		"wiki"  : "http://server.local/wiki/projects/cog",
+		"issues": "http://github.com/messagedigital/cog-mothership-ecommerce/issues"
+	},
+	"autoload": {
+		"psr-0": {
+			"Message\\Mothership\\Ecommerce"      : "src",
+			"Message\\Mothership\\Ecommerce\\Test": "tests"
+		}
+	},
 	"repositories": [
 		{
 			"type": "composer",
@@ -20,23 +30,9 @@
 		"message/cog"                       : "dev-master",
 		"message/cog-mothership-commerce"   : "dev-master"
 	},
-	"config": {
-		"bin-dir": "bin"
-	},
-	"scripts": {
-		"post-package-install": [
-			"Message\\Cog\\Config\\FixtureManager::postInstall"
-		],
-		"pre-package-update": [
-			"Message\\Cog\\Config\\FixtureManager::preUpdate"
-		],
-		"post-package-update": [
-			"Message\\Cog\\Config\\FixtureManager::postUpdate"
-		]
-	},
-	"autoload": {
-		"psr-0": {
-			"UniformWares": "app/"
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.0.x-dev"
 		}
 	}
 }
