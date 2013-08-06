@@ -1,0 +1,42 @@
+{
+	"name": "message/cog-mothership-fedex",
+	"description": "Cog module for dispatching using Fedex",
+	"keywords": ["commerce", "mothership", "order", "orders", "products", "money", "cog", "fedex", "dispatch"],
+	"homepage": "http://message.co.uk",
+	"authors": [
+		{
+			"name" : "The Message Development Team",
+			"email": "dev@message.co.uk"
+		}
+	],
+	"repositories": [
+		{
+			"type": "composer",
+			"url" : "http://packages.message.co.uk"
+		}
+	],
+	"minimum-stability": "dev",
+	"require": {
+		"message/cog"                       : "dev-master",
+		"message/cog-mothership-commerce"   : "dev-master"
+	},
+	"config": {
+		"bin-dir": "bin"
+	},
+	"scripts": {
+		"post-package-install": [
+			"Message\\Cog\\Config\\FixtureManager::postInstall"
+		],
+		"pre-package-update": [
+			"Message\\Cog\\Config\\FixtureManager::preUpdate"
+		],
+		"post-package-update": [
+			"Message\\Cog\\Config\\FixtureManager::postUpdate"
+		]
+	},
+	"autoload": {
+		"psr-0": {
+			"UniformWares": "app/"
+		}
+	}
+}
