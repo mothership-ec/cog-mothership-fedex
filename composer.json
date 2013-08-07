@@ -11,7 +11,7 @@
 	],
 	"support": {
 		"wiki"  : "http://server.local/wiki/projects/cog",
-		"issues": "http://github.com/messagedigital/cog-mothership-ecommerce/issues"
+		"issues": "http://github.com/messagedigital/cog-mothership-fedex/issues"
 	},
 	"autoload": {
 		"psr-0": {
