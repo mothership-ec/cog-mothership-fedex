@@ -1,17 +1,22 @@
 <?php
 
-namespace Message\Mothership\Fedex\Method;
+namespace Message\Mothership\Fedex\DispatchMethod;
 
 use Message\Mothership\Commerce\Order\Entity\Dispatch\MethodInterface;
 
-class FedexUkMethod implements MethodInterface
+/**
+ * FedEx UK dispatch method.
+ *
+ * @author Joe Holdcroft <joe@message.co.uk>
+ */
+class FedexUk implements MethodInterface
 {
 	/**
 	 * {@inheritDoc}
 	 */
 	public function getName()
 	{
-		return 'fedexuk';
+		return 'fedex-uk';
 	}
 
 	/**
@@ -27,6 +32,6 @@ class FedexUkMethod implements MethodInterface
 	 */
 	public function getTrackingLink($code)
 	{
-
+		return 'http://www.fedexuk.net/accounts/QuickTrack.aspx?consignment=' . $code;
 	}
 }
