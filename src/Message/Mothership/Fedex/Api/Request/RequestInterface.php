@@ -17,6 +17,14 @@ interface RequestInterface
 	public function getService();
 
 	/**
+	 * Get the name of the method to run on the service returned by
+	 * `getService()` for this request.
+	 *
+	 * @return string
+	 */
+	public function getMethod();
+
+	/**
 	 * Validate this request.
 	 *
 	 * This method should throw the appropriate exceptions when necessary. It

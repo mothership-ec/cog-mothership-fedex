@@ -1,62 +1,73 @@
 <?php
 
-namespace Message\Mothership\Fedex\Request;
+namespace Message\Mothership\Fedex\Api\Request;
 
-class UploadDocuments extends Request
+use Message\Mothership\Fedex\Api\Service;
+use Message\Mothership\Fedex\Api\Exception;
+use Message\Mothership\Fedex\Api\Document;
+
+/**
+ * Upload one or more documents to the FedEx API.
+ *
+ * @author Joe Holdcroft <joe@message.co.uk>
+ */
+class UploadDocuments implements RequestInterface
 {
-	protected $_wsdlName  = 'UploadDocumentService_v1.1';
-	protected $_serviceID = 'cdus';
-
-	protected $_destinationCountryID;
+	protected $_originCountryCode;
+	protected $_destinationCountryCode;
 	protected $_documents = array();
 
-	public function setDestinationCountryID($countryID)
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getService()
 	{
-		static $countries;
-		if (!$countries) {
-			$countries = getCountries();
-		}
-		if (!isset($countries[$countryID])) {
-			throw new \InvalidArgumentException('Invalid country code: ' . $countryID);
-		}
-		$this->_destinationCountryID = $countryID;
+		return new Service\UploadDocument;
 	}
 
-	public function addDocument(\Fedex\Document $document)
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getMethod()
 	{
-		$this->_documents[] = $document;
+		return 'UploadDocuments';
 	}
 
-	public function getDocuments()
-	{
-		return $this->_documents;
-	}
-
-	protected function _validate()
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @throws Exception\Exception If no documents have been set
+	 * @throws Exception\Exception If the origin country code is not set
+	 * @throws Exception\Exception If the destination country code is not set
+	 */
+	public function validate()
 	{
 		if (count($this->_documents) < 1) {
-			throw new \Exception('At least one document must be set to upload documents.', \Exception::DOCS_NOT_SET);
+			throw new Exception\Exception('At least one document must be set to upload documents');
 		}
+
+		if (!$this->_originCountryCode) {
+			throw new Exception\Exception('Origin country code not set');
+		}
+
 		if (!$this->_destinationCountryID) {
-			throw new \Exception('Destination country code not set.', \Exception::DEST_COUNTRY_NOT_SET);
+			throw new Exception\Exception('Destination country code not set');
 		}
-		return true;
 	}
 
-	protected function _getRequestFields()
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getRequestData()
 	{
-		return array(
-			'OriginCountryCode'      => \Config::get('fedex')->contact->address->countryCode,
-			'DestinationCountryCode' => null,
-			'Documents'              => array()
+		$data = array(
+			'OriginCountryCode'      => $this->_originCountryCode,
+			'DestinationCountryCode' => $this->_destinationCountryCode,
+			'Documents'              => array(),
 		);
-	}
 
-	protected function _buildRequest()
-	{
-		$this->_request['DestinationCountryCode'] = $this->_destinationCountryID;
 		foreach ($this->_documents as $i => $document) {
-			$this->_request['Documents'][] = array(
+			$data['Documents'][] = array(
 				'LineNumber'        => $i,
 				'CustomerReference' => $document->getReference(),
 				'DocumentType'      => $document->getType(),
@@ -64,5 +75,37 @@ class UploadDocuments extends Request
 				'DocumentContent'   => $document->getContents()
 			);
 		}
+
+		return $data;
+	}
+
+	/**
+	 * Set the destination country code for the documents being uploaded.
+	 *
+	 * @param string $code The destination country code
+	 */
+	public function setDestinationCountryCode($code)
+	{
+		$this->_destinationCountryCode = $code;
+	}
+
+	/**
+	 * Set the origin country code for the documents being uploaded.
+	 *
+	 * @param string $code The origin country code
+	 */
+	public function setOriginCountryCode($code)
+	{
+		$this->_originCountryCode = $code;
+	}
+
+	/**
+	 * Add a document to be uploaded to FedEx with this request.
+	 *
+	 * @param Document $document The document to add
+	 */
+	public function addDocument(Document $document)
+	{
+		$this->_documents[] = $document;
 	}
 }
