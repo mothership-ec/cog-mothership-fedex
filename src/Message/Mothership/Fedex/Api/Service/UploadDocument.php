@@ -14,7 +14,7 @@ class UploadDocument implements ServiceInterface
 	 */
 	public function getWsdlPath()
 	{
-		return 'cog://@Message:Mothership:Fedex::resources:wsdl:UploadDocument:1.1.0.wsdl';
+		return 'cog://@Message:Mothership:Fedex::resources/wsdl/UploadDocument/1.1.0.wsdl';
 	}
 
 	/**
