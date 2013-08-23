@@ -3,6 +3,7 @@
 namespace Message\Mothership\Fedex\Api\Request;
 
 use Message\Mothership\Fedex\Api\Service;
+use Message\Mothership\Fedex\Api\Response;
 use Message\Mothership\Fedex\Api\Exception;
 use Message\Mothership\Fedex\Api\Document;
 
@@ -35,6 +36,14 @@ class UploadDocuments implements RequestInterface
 
 	/**
 	 * {@inheritDoc}
+	 */
+	public function getResponseObject()
+	{
+		return new Response\UploadDocuments;
+	}
+
+	/**
+	 * {@inheritDoc}
 	 *
 	 * @throws Exception\Exception If no documents have been set
 	 * @throws Exception\Exception If the origin country code is not set
@@ -50,7 +59,7 @@ class UploadDocuments implements RequestInterface
 			throw new Exception\Exception('Origin country code not set');
 		}
 
-		if (!$this->_destinationCountryID) {
+		if (!$this->_destinationCountryCode) {
 			throw new Exception\Exception('Destination country code not set');
 		}
 	}

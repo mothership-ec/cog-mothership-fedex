@@ -38,4 +38,11 @@ interface RequestInterface
 	 * @return array
 	 */
 	public function getRequestData();
+
+	/**
+	 * Get the response object to use for the response to this request.
+	 *
+	 * @return \Message\Mothership\Fedex\Api\Response\ResponseInterface
+	 */
+	public function getResponseObject();
 }

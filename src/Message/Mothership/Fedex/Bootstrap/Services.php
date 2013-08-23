@@ -22,5 +22,16 @@ class Services implements ServicesInterface
 
 			return $methods;
 		}));
+
+		$container['fedex.api.dispatcher'] = function($c) {
+			$dispatcher = new Fedex\Api\Dispatcher;
+			$cfg        = $c['cfg']->fedex;
+
+			$dispatcher->setApiDetails($cfg->apiKey, $cfg->apiPassword);
+			$dispatcher->setAccountNumber($cfg->accountNumber);
+			$dispatcher->setMeterNumber($cfg->meterNumber);
+
+			return $dispatcher;
+		};
 	}
 }
