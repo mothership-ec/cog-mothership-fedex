@@ -117,4 +117,14 @@ class UploadDocuments implements RequestInterface
 	{
 		$this->_documents[] = $document;
 	}
+
+	/**
+	 * Get all documents defined on this request.
+	 *
+	 * @return array[Document]
+	 */
+	public function getDocuments()
+	{
+		return $this->_documents;
+	}
 }

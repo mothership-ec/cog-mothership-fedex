@@ -23,4 +23,8 @@ interface ResponseInterface
 	public function getData();
 
 	public function getNotifications();
+
+	public function validate();
+
+	public function init();
 }

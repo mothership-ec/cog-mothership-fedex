@@ -71,7 +71,8 @@ class Dispatcher
 			throw Exception\ResponseErrorException::createFromResponse($response);
 		}
 
-		de($response);
+		$response->validate();
+		$response->init();
 
 		return $response;
 	}

@@ -4,7 +4,7 @@ namespace Message\Mothership\Fedex\Api\Exception;
 
 use Message\Mothership\Fedex\Api\Response\ResponseInterface;
 
-class ResponseErrorException extends Exception
+class ResponseErrorException extends ResponseException
 {
 	protected $_response;
 

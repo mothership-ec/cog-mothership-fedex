@@ -2,56 +2,48 @@
 
 namespace Message\Mothership\Fedex\Api\Response;
 
-use Message\Mothership\Fedex\Request\Request;
+use Message\Mothership\Fedex\Api\Exception;
 
-class UploadDocuments extends Response
+class UploadDocuments extends AbstractResponse
 {
-	// protected $_documents;
+	public function validate()
+	{
+		if (!isset($this->getData()->DocumentStatuses) || empty($this->getData()->DocumentStatuses)) {
+			$exception = new Exception\ResponseException('No document statuses returned');
+			$exception->setResponse($this);
 
-	// public function __construct($response, Request $request)
-	// {
-	// 	// IF ONLY ONE DocumentStatus RETURNED, IT'S NOT RETURNED IN
-	// 	// AN ARRAY FOR SOME REASON. THIS FIXES THAT.
-	// 	if (isset($response->DocumentStatuses) && is_object($response->DocumentStatuses)) {
-	// 		$response->DocumentStatuses = array($response->DocumentStatuses);
-	// 	}
-	// 	parent::__construct($response, $request);
-	// 	$this->_setDocumentIDs();
-	// }
+			throw $exception;
+		}
+	}
 
-	// public function getDocuments()
-	// {
-	// 	return $this->_request->getDocuments();
-	// }
+	public function init()
+	{
+		// Ensure DocumentStatuses is iterable (if only one document, it's not returned in an array)
+		if (!is_array($this->getData()->DocumentStatuses)) {
+			$this->getData()->DocumentStatuses = array($this->getData()->DocumentStatuses);
+		}
 
-	// protected function _validate()
-	// {
-	// 	if (!isset($this->_response->DocumentStatuses) || empty($this->_response->DocumentStatuses)) {
-	// 		throw new \Exception('No document statuses returned.', Exception::NO_DOC_STATUS_RETURNED);
-	// 	}
-	// }
+		// Set the FedEx IDs for the documents
+		foreach ($this->getRequest()->getDocuments() as $lineNum => $document) {
+			$responseDoc = $this->_getResponseDocument($lineNum);
 
-	// protected function _setDocumentIDs()
-	// {
-	// 	foreach ($this->getDocuments() as $key => $document) {
-	// 		$document->setID($this->_getResponseDocument($key)->DocumentId);
-	// 	}
-	// }
+			$document->setID($responseDoc->DocumentId);
+		}
+	}
 
-	// /**
-	//  * Get a DocumentStatuses node by LineNumber. LineNumber is
-	//  * also the index on the document array in the request.
-	//  *
-	//  * @return stdClass Node from DocumentStatuses with the matching LineNumber
-	//  */
-	// protected function _getResponseDocument($key)
-	// {
-	// 	foreach ($this->_response->DocumentStatuses as $document) {
-	// 		if ($document->LineNumber == $key) {
-	// 			return $document;
-	// 		}
-	// 	}
-	// 	throw new \Exception('Could not find document with key: ' . $key, Exception::DOC_KEY_NOT_FOUND);
-	// }
+	public function getDocuments()
+	{
+		return $this->getRequest()->getDocuments();
+	}
 
+	protected function _getResponseDocument($lineNumber)
+	{
+		foreach ($this->getData()->DocumentStatuses as $doc) {
+			if ($lineNumber == $doc->LineNumber) {
+				return $doc;
+			}
+		}
+
+		throw new Exception\Exception(sprintf('UploadDocuments did not return document with line number `%s`', $lineNumber));
+	}
 }
