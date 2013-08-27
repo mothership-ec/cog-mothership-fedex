@@ -14,8 +14,8 @@ use Message\Mothership\Fedex\Api\Document;
  */
 class UploadDocuments implements RequestInterface
 {
-	protected $_originCountryCode;
-	protected $_destinationCountryCode;
+	protected $_originCountryID;
+	protected $_destinationCountryID;
 	protected $_documents = array();
 
 	/**
@@ -46,8 +46,8 @@ class UploadDocuments implements RequestInterface
 	 * {@inheritDoc}
 	 *
 	 * @throws Exception\Exception If no documents have been set
-	 * @throws Exception\Exception If the origin country code is not set
-	 * @throws Exception\Exception If the destination country code is not set
+	 * @throws Exception\Exception If the origin country ID is not set
+	 * @throws Exception\Exception If the destination country ID is not set
 	 */
 	public function validate()
 	{
@@ -55,12 +55,12 @@ class UploadDocuments implements RequestInterface
 			throw new Exception\Exception('At least one document must be set to upload documents');
 		}
 
-		if (!$this->_originCountryCode) {
-			throw new Exception\Exception('Origin country code not set');
+		if (!$this->_originCountryID) {
+			throw new Exception\Exception('Origin country ID not set');
 		}
 
-		if (!$this->_destinationCountryCode) {
-			throw new Exception\Exception('Destination country code not set');
+		if (!$this->_destinationCountryID) {
+			throw new Exception\Exception('Destination country ID not set');
 		}
 	}
 
@@ -70,8 +70,8 @@ class UploadDocuments implements RequestInterface
 	public function getRequestData()
 	{
 		$data = array(
-			'OriginCountryCode'      => $this->_originCountryCode,
-			'DestinationCountryCode' => $this->_destinationCountryCode,
+			'OriginCountryCode'      => $this->_originCountryID,
+			'DestinationCountryCode' => $this->_destinationCountryID,
 			'Documents'              => array(),
 		);
 
@@ -89,23 +89,23 @@ class UploadDocuments implements RequestInterface
 	}
 
 	/**
-	 * Set the destination country code for the documents being uploaded.
+	 * Set the destination country id for the documents being uploaded.
 	 *
-	 * @param string $code The destination country code
+	 * @param string $id The destination country id
 	 */
-	public function setDestinationCountryCode($code)
+	public function setDestinationCountryID($id)
 	{
-		$this->_destinationCountryCode = $code;
+		$this->_destinationCountryID = $id;
 	}
 
 	/**
-	 * Set the origin country code for the documents being uploaded.
+	 * Set the origin country id for the documents being uploaded.
 	 *
-	 * @param string $code The origin country code
+	 * @param string $id The origin country id
 	 */
-	public function setOriginCountryCode($code)
+	public function setOriginCountryID($id)
 	{
-		$this->_originCountryCode = $code;
+		$this->_originCountryID = $id;
 	}
 
 	/**
