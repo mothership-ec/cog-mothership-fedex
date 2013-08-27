@@ -4,6 +4,8 @@ namespace Message\Mothership\Fedex\Bootstrap;
 
 use Message\Mothership\Fedex;
 
+use Message\Mothership\Commerce\Address\Address;
+
 use Message\Cog\Bootstrap\ServicesInterface;
 
 /**
@@ -34,6 +36,43 @@ class Services implements ServicesInterface
 			$dispatcher->setMeterNumber($cfg->meterNumber);
 
 			return $dispatcher;
+		};
+
+		$container['fedex.shipment'] = function($c) {
+			$shipment = new Fedex\Api\Shipment;
+
+			// Create Address object for merchant address
+			$shipperAddress = new Address;
+			$shipperAddress->setLines($c['cfg']->merchant->address->lines);
+			$shipperAddress->telephone = $c['cfg']->merchant->telephone;
+			$shipperAddress->town      = $c['cfg']->merchant->address->town;
+			$shipperAddress->postcode  = $c['cfg']->merchant->address->postcode;
+			$shipperAddress->countryID = $c['cfg']->merchant->address->countryID;
+			$shipperAddress->stateID   = $c['cfg']->merchant->address->stateID;
+
+			// Set shipper address & contact details
+			$shipment->setShipper($shipperAddress, $c['cfg']->merchant->companyName);
+
+			// Set VAT registration number, if defined
+			if ($vatReg = $c['cfg']->merchant->vatRegistration) {
+				$shipment->setTin($vatReg);
+			}
+
+			// Set terms of sale
+			$shipment->setTermsOfSale($c['cfg']->fedex->termsOfSale);
+
+			// Set payment types
+			$shipment->setTransportationPaymentType($c['cfg']->fedex->payment->transportation);
+			$shipment->setDutiesPaymentType($c['cfg']->fedex->payment->duties);
+
+			// Set label specification
+			$shipment->setLabelSpec(
+				$c['cfg']->fedex->label->format,
+				$c['cfg']->fedex->label->imageType,
+				$c['cfg']->fedex->label->stockType
+			);
+
+			return $shipment;
 		};
 	}
 }

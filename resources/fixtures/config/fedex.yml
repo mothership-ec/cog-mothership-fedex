@@ -3,3 +3,11 @@ api-key:
 api-password:
 meter-number:
 account-number:
+terms-of-sale: DDU
+payment:
+  transportation: SENDER
+  duties: RECIPIENT
+label:
+  format: COMMON2D
+  image-type: PDF
+  stock-type:
