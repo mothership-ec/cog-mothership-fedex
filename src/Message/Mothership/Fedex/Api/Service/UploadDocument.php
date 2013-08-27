@@ -20,6 +20,16 @@ class UploadDocument implements ServiceInterface
 	/**
 	 * {@inheritDoc}
 	 */
+	public function getWsdlEndpoint($testMode = false)
+	{
+		return $testMode
+			? 'https://wsbeta.fedex.com:443/web-services/uploaddocument'
+			: 'https://ws.fedex.com:443/web-services/uploaddocument';
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public function getVersion()
 	{
 		return '1.1.0';

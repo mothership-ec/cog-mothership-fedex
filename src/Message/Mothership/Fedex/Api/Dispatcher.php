@@ -9,7 +9,14 @@ class Dispatcher
 	protected $_accountNumber;
 	protected $_meterNumber;
 
+	protected $_testMode = false;
+
 	protected $_client;
+
+	public function setTestMode($bool = true)
+	{
+		$this->_testMode = (bool) $bool;
+	}
 
 	public function setApiDetails($key, $password)
 	{
@@ -47,9 +54,8 @@ class Dispatcher
 		// Build the full request data
 		$data = $this->buildRequestData($request);
 
-
 		// Create the SOAP client
-		$client = new \SoapClient($request->getService()->getWsdlPath(), array('trace' => 1));
+		$client = $this->getSoapClient($request->getService());
 
 		// Send the request
 		$responseData = $client->{$request->getMethod()}($data);
@@ -65,12 +71,14 @@ class Dispatcher
 			throw Exception\ResponseErrorException::createFromResponse($response);
 		}
 
+		de($response);
+
 		return $response;
 	}
 
 	public function buildRequestData(Request\RequestInterface $request)
 	{
-		$data = $request->getRequestData();
+		$data = array();
 
 		$data['WebAuthenticationDetail'] = array(
 			'UserCredential' => array(
@@ -92,11 +100,20 @@ class Dispatcher
 
 		$data['Version'] = array(
 			'ServiceId'    => $request->getService()->getServiceName(),
-			'Major'        => $major,
-			'Intermediate' => $intermediate,
-			'Minor'        => $minor,
+			'Major'        => (string) $major,
+			'Intermediate' => (string) $intermediate,
+			'Minor'        => (int) $minor,
 		);
 
-		return $data;
+		return array_merge($data, $request->getRequestData());
+	}
+
+	public function getSoapClient(Service\ServiceInterface $service)
+	{
+		$client = new \SoapClient($service->getWsdlPath(), array('trace' => 1));
+
+		$client->__setLocation($service->getWsdlEndpoint($this->_testMode));
+
+		return $client;
 	}
 }

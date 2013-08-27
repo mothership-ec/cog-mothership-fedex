@@ -27,6 +27,8 @@ class Services implements ServicesInterface
 			$dispatcher = new Fedex\Api\Dispatcher;
 			$cfg        = $c['cfg']->fedex;
 
+			$dispatcher->setTestMode($cfg->testMode);
+
 			$dispatcher->setApiDetails($cfg->apiKey, $cfg->apiPassword);
 			$dispatcher->setAccountNumber($cfg->accountNumber);
 			$dispatcher->setMeterNumber($cfg->meterNumber);
