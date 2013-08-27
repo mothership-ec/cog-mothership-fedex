@@ -39,6 +39,5 @@ This cogule provides two dispatch methods that are added to the `order.dispatch.
 - Catch SoapFault's ?
 - Add the `Ship` request + response
 - Add service for the public API classes that need to be services
-- Set the dispatch methos selection function in `uniform_wares/mothership` to select FedEx UK for UK delivery orders, and FedexExpress for others
 - Add config for ETD stuff
-- How to deal with the different endpoint URL in the WSDL when testing? we have separate WSDL files for live and test atm
+- Finish writing readme
