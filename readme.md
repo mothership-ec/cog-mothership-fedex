@@ -22,6 +22,11 @@ You will need to add Message's private package server to the `repositories` key 
 
 ## Dispatch Methods
 
+This cogule provides two dispatch methods that are added to the `order.dispatch.methods` service:
+
+- FedEx Express (`fedex-express`)
+- FedEx UK (`fedex-uk`)
+
 ## Shipping
 
 ### Electronic Trade Documents (ETD)
