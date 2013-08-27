@@ -38,6 +38,7 @@ This cogule provides two dispatch methods that are added to the `order.dispatch.
 - Log requests and responses to the API
 - Catch SoapFault's ?
 - Add the `Ship` request + response
+- Provide a way to set the transaction ID for a request? (new method?)
 - Add service for the public API classes that need to be services
 - Add config for ETD stuff
 - Finish writing readme
