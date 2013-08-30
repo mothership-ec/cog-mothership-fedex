@@ -27,18 +27,30 @@ This cogule provides two dispatch methods that are added to the `order.dispatch.
 - FedEx Express (`fedex-express`)
 - FedEx UK (`fedex-uk`)
 
-## Shipping
+## API
 
-### Electronic Trade Documents (ETD)
+- dispatcher is for dispatching
+- whats a prepared request?
+- responses
+- services
+
+### Events
+
+### Uploading Documents
+
+### Shipping
+
+#### Electronic Trade Documents (ETD)
 
 #### Generated Commercial Invoice
 
 ## Todo
 
-- Log requests and responses to the API
+- Log requests and responses to the API using the events
 - Catch SoapFault's ?
 - Add the `Ship` request + response
 - Provide a way to set the transaction ID for a request? (new method?)
 - Add service for the public API classes that need to be services
 - Add config for ETD stuff
 - Finish writing readme
+- In EventListener, set the code, cost & documents on the event and stop propagation
