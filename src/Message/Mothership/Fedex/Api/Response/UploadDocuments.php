@@ -19,7 +19,7 @@ class UploadDocuments extends AbstractResponse
 	 */
 	public function validate()
 	{
-		if (!isset($this->getRequestData()->DocumentStatuses) || empty($this->getRequestData()->DocumentStatuses)) {
+		if (!isset($this->getData()->DocumentStatuses) || empty($this->getData()->DocumentStatuses)) {
 			$exception = new Exception\ResponseException('No document statuses returned');
 			$exception->setResponse($this);
 
@@ -39,8 +39,8 @@ class UploadDocuments extends AbstractResponse
 	public function init()
 	{
 		// Ensure DocumentStatuses is iterable (if only one document, it's not returned in an array)
-		if (!is_array($this->getRequestData()->DocumentStatuses)) {
-			$this->getRequestData()->DocumentStatuses = array($this->getRequestData()->DocumentStatuses);
+		if (!is_array($this->getData()->DocumentStatuses)) {
+			$this->getData()->DocumentStatuses = array($this->getData()->DocumentStatuses);
 		}
 
 		// Set the FedEx IDs for the documents

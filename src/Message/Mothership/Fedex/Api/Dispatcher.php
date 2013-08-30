@@ -67,6 +67,7 @@ class Dispatcher
 
 		// Build response object
 		$response = $request->getResponseObject();
+		$response->setData($responseData);
 		$response->setPreparedRequest($preparedRequest);
 		$response->setNotifications(Notification\Collection::loadFromResponse($response));
 

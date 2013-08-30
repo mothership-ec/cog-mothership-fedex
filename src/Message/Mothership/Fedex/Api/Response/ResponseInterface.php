@@ -17,6 +17,8 @@ interface ResponseInterface
 
 	public function setNotifications(Notification\Collection $collection);
 
+	public function setData($data);
+
 	public function getPreparedRequest();
 
 	public function getRequest();
@@ -24,6 +26,8 @@ interface ResponseInterface
 	public function getRequestData();
 
 	public function getNotifications();
+
+	public function getData();
 
 	public function validate();
 

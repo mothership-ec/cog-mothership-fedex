@@ -9,6 +9,7 @@ use Message\Mothership\Fedex\Api\Notification;
 abstract class AbstractResponse implements ResponseInterface
 {
 	protected $_request;
+	protected $_data;
 	protected $_notifications;
 
 	public function setPreparedRequest(PreparedRequest $request)
@@ -19,6 +20,11 @@ abstract class AbstractResponse implements ResponseInterface
 	public function setNotifications(Notification\Collection $collection)
 	{
 		$this->_notifications = $collection;
+	}
+
+	public function setData($data)
+	{
+		$this->_data = $data;
 	}
 
 	public function getPreparedRequest()
@@ -39,5 +45,10 @@ abstract class AbstractResponse implements ResponseInterface
 	public function getNotifications()
 	{
 		return $this->_notifications;
+	}
+
+	public function getData()
+	{
+		return $this->_data;
 	}
 }
