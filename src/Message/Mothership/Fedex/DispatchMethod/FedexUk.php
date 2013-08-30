@@ -34,4 +34,12 @@ class FedexUk implements MethodInterface
 	{
 		return 'http://www.fedexuk.net/accounts/QuickTrack.aspx?consignment=' . $code;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function allowAutomaticPostage()
+	{
+		return false;
+	}
 }

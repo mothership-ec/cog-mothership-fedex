@@ -34,4 +34,12 @@ class FedexExpress implements MethodInterface
 	{
 		return 'http://fedex.com/Tracking?tracknumbers=' . $code;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function allowAutomaticPostage()
+	{
+		return true;
+	}
 }
