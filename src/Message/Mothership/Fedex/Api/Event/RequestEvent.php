@@ -7,16 +7,21 @@ use Message\Mothership\Fedex\Api\PreparedRequest;
 
 class RequestEvent extends Event
 {
-	protected $_request;
+	protected $_preparedRequest;
 
 	public function __construct(Dispatcher $dispatcher, PreparedRequest $request)
 	{
-		$this->_dispatcher = $dispatcher;
-		$this->_request    = $request;
+		$this->_dispatcher      = $dispatcher;
+		$this->_preparedRequest = $request;
+	}
+
+	public function getPreparedRequest()
+	{
+		return $this->_preparedRequest;
 	}
 
 	public function getRequest()
 	{
-		return $this->_request;
+		return $this->_preparedRequest->getRequest();
 	}
 }

@@ -9,7 +9,6 @@ use Message\Mothership\Fedex\Api\Notification;
 abstract class AbstractResponse implements ResponseInterface
 {
 	protected $_request;
-	protected $_data;
 	protected $_notifications;
 
 	public function setPreparedRequest(PreparedRequest $request)

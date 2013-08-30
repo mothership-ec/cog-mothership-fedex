@@ -63,7 +63,7 @@ class Collection implements \IteratorAggregate, \Countable
 			}
 		}
 
-		return $mostSevere->severity;
+		return $mostSevere ? $mostSevere->severity : null;
 	}
 
 	public function getBySeverity($severity)

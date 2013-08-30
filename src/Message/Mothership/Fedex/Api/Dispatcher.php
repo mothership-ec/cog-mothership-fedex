@@ -53,9 +53,7 @@ class Dispatcher
 
 		// Send the request
 		try {
-			#de($data)->depth(6);
-			$method = (string) $request->getMethod();
-			$responseData = $client->$method($preparedRequest->getData());
+			$responseData = $client->{$request->getMethod()}($preparedRequest->getData());
 		}
 		catch (\SoapFault $e) {
 			d($e);
@@ -71,7 +69,7 @@ class Dispatcher
 		$response = $request->getResponseObject();
 		$response->setPreparedRequest($preparedRequest);
 		$response->setNotifications(Notification\Collection::loadFromResponse($response));
-		de($preparedRequest, $responseData)->depth(6);
+
 		// Throw response failure exception if the response has errors
 		if ($response->getNotifications()->hasErrors()) {
 			throw Exception\ResponseErrorException::createFromResponse($response);

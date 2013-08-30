@@ -13,6 +13,11 @@ class PreparedRequest
 
 	protected $_data;
 
+	public function getRequest()
+	{
+		return $this->_request;
+	}
+
 	public function setRequest(Request\RequestInterface $request)
 	{
 		$this->_request = $request;
