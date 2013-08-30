@@ -13,7 +13,7 @@ class ResponseException extends Exception
 		$this->_response = $response;
 	}
 
-	public function getResponse(ResponseInterface $response)
+	public function getResponse()
 	{
 		return $this->_response;
 	}

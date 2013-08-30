@@ -6,8 +6,6 @@ use Message\Mothership\Fedex\Api\Response\ResponseInterface;
 
 class ResponseErrorException extends ResponseException
 {
-	protected $_response;
-
 	static public function createFromResponse(ResponseInterface $response)
 	{
 		$messages = array();
@@ -21,15 +19,5 @@ class ResponseErrorException extends ResponseException
 		$exception->setResponse($response);
 
 		return $exception;
-	}
-
-	public function setResponse(ResponseInterface $response)
-	{
-		$this->_response = $response;
-	}
-
-	public function getResponse(ResponseInterface $response)
-	{
-		return $this->_response;
 	}
 }
