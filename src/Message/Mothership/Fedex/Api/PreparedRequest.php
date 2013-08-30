@@ -36,7 +36,7 @@ class PreparedRequest
 
 	public function getData($reload = false)
 	{
-		if (!$this->_data) {
+		if (!$this->_data || $reload) {
 			if (!$this->_request) {
 				throw new \LogicException('API request must be set for a prepared FedEx API request');
 			}
