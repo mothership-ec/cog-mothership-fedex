@@ -12,11 +12,11 @@ class Collection implements \IteratorAggregate, \Countable
 	{
 		$collection = new self;
 
-		if (!isset($response->getData()->Notifications)) {
-			return false;
+		if (!isset($response->getRequestData()->Notifications)) {
+			return $collection;
 		}
 
-		$notifications = $response->getData()->Notifications;
+		$notifications = $response->getRequestData()->Notifications;
 
 		// If there's only one notification, it's never in an array :-(
 		if (is_object($notifications)) {

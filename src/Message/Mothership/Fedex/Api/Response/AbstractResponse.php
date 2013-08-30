@@ -2,6 +2,7 @@
 
 namespace Message\Mothership\Fedex\Api\Response;
 
+use Message\Mothership\Fedex\Api\PreparedRequest;
 use Message\Mothership\Fedex\Api\Request\RequestInterface;
 use Message\Mothership\Fedex\Api\Notification;
 
@@ -11,14 +12,9 @@ abstract class AbstractResponse implements ResponseInterface
 	protected $_data;
 	protected $_notifications;
 
-	public function setRequest(RequestInterface $request)
+	public function setPreparedRequest(PreparedRequest $request)
 	{
 		$this->_request = $request;
-	}
-
-	public function setData($data)
-	{
-		$this->_data = $data;
 	}
 
 	public function setNotifications(Notification\Collection $collection)
@@ -26,14 +22,19 @@ abstract class AbstractResponse implements ResponseInterface
 		$this->_notifications = $collection;
 	}
 
-	public function getRequest()
+	public function getPreparedRequest()
 	{
 		return $this->_request;
 	}
 
-	public function getData()
+	public function getRequest()
 	{
-		return $this->_data;
+		return $this->_request->getRequest();
+	}
+
+	public function getRequestData()
+	{
+		return $this->_request->getData();
 	}
 
 	public function getNotifications()

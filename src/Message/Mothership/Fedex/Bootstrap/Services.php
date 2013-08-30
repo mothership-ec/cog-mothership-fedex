@@ -25,20 +25,26 @@ class Services implements ServicesInterface
 			return $methods;
 		}));
 
+		$container['fedex.api.prepared_request'] = function($c) {
+			$cfg     = $c['cfg']->fedex;
+			$request = new Fedex\Api\PreparedRequest;
+
+			$request->setApiDetails($cfg->apiKey, $cfg->apiPassword);
+			$request->setAccountNumber($cfg->accountNumber);
+			$request->setMeterNumber($cfg->meterNumber);
+
+			return $request;
+		};
+
 		$container['fedex.api.dispatcher'] = function($c) {
-			$dispatcher = new Fedex\Api\Dispatcher;
-			$cfg        = $c['cfg']->fedex;
+			$dispatcher = new Fedex\Api\Dispatcher($c['fedex.api.prepared_request'], $c['event.dispatcher']);
 
-			$dispatcher->setTestMode($cfg->testMode);
-
-			$dispatcher->setApiDetails($cfg->apiKey, $cfg->apiPassword);
-			$dispatcher->setAccountNumber($cfg->accountNumber);
-			$dispatcher->setMeterNumber($cfg->meterNumber);
+			$dispatcher->setTestMode($c['cfg']->fedex->testMode);
 
 			return $dispatcher;
 		};
 
-		$container['fedex.shipment'] = function($c) {
+		$container['fedex.api.shipment'] = function($c) {
 			$shipment = new Fedex\Api\Shipment;
 
 			// Create Address object for merchant address
@@ -51,7 +57,7 @@ class Services implements ServicesInterface
 			$shipperAddress->stateID   = $c['cfg']->merchant->address->stateID;
 
 			// Set shipper address & contact details
-			$shipment->setShipper($shipperAddress, $c['cfg']->merchant->companyName);
+			$shipment->setShipper($shipperAddress, $c['cfg']->merchant->companyName, $c['cfg']->merchant->companyName);
 
 			// Set VAT registration number, if defined
 			if ($vatReg = $c['cfg']->merchant->vatRegistration) {
@@ -62,8 +68,15 @@ class Services implements ServicesInterface
 			$shipment->setTermsOfSale($c['cfg']->fedex->termsOfSale);
 
 			// Set payment types
-			$shipment->setTransportationPaymentType($c['cfg']->fedex->payment->transportation);
-			$shipment->setDutiesPaymentType($c['cfg']->fedex->payment->duties);
+			$shipment->setTransportationPayment(
+				$c['cfg']->fedex->payment->transportation->type,
+				$c['cfg']->fedex->payment->transportation->accountNumber,
+				$c['cfg']->fedex->payment->transportation->countryCode
+			);
+			$shipment->setDutiesPaymentType($c['cfg']->fedex->payment->duties->type);
+
+			// Set service type
+			$shipment->setServiceType($c['cfg']->fedex->serviceType);
 
 			// Set label specification
 			$shipment->setLabelSpec(

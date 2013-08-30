@@ -5,8 +5,12 @@ meter-number:
 account-number:
 terms-of-sale: DDU
 payment:
-  transportation: SENDER
-  duties: RECIPIENT
+  transportation:
+    type: SENDER
+    account-number: 510087569
+    country-code: GB
+  duties:
+    type: RECIPIENT
 label:
   format: COMMON2D
   image-type: PDF

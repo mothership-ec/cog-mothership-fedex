@@ -2,6 +2,7 @@
 
 namespace Message\Mothership\Fedex\Api\Response;
 
+use Message\Mothership\Fedex\Api\PreparedRequest;
 use Message\Mothership\Fedex\Api\Request\RequestInterface;
 use Message\Mothership\Fedex\Api\Notification;
 
@@ -12,15 +13,15 @@ use Message\Mothership\Fedex\Api\Notification;
  */
 interface ResponseInterface
 {
-	public function setRequest(RequestInterface $request);
-
-	public function setData($data);
+	public function setPreparedRequest(PreparedRequest $request);
 
 	public function setNotifications(Notification\Collection $collection);
 
+	public function getPreparedRequest();
+
 	public function getRequest();
 
-	public function getData();
+	public function getRequestData();
 
 	public function getNotifications();
 
