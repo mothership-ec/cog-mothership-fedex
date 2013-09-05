@@ -73,7 +73,7 @@ class UploadDocuments extends AbstractResponse
 	 */
 	protected function _getResponseDocument($lineNumber)
 	{
-		foreach ($this->getRequestData()->DocumentStatuses as $doc) {
+		foreach ($this->getData()->DocumentStatuses as $doc) {
 			if ($lineNumber == $doc->LineNumber) {
 				return $doc;
 			}
