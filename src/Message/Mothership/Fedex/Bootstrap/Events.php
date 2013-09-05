@@ -15,6 +15,6 @@ class Events implements EventsInterface
 {
 	public function registerEvents($dispatcher)
 	{
-		$dispatcher->addSubscriber(new Fedex\EventListener);
+		$dispatcher->addSubscriber(new Fedex\EventListener\OrderListener);
 	}
 }
