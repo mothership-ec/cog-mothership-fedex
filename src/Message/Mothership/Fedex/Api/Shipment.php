@@ -209,6 +209,19 @@ class Shipment
 		return $this->_recipientAddress;
 	}
 
+	public function getLabelFileExtension()
+	{
+		if ('PDF' === $this->_labelSpec['imgType']) {
+			return 'pdf';
+		}
+
+		if ('PNG' === $this->_labelSpec['imgType']) {
+			return 'png';
+		}
+
+		return 'txt';
+	}
+
 	public function getRequestData()
 	{
 		$data = array(
