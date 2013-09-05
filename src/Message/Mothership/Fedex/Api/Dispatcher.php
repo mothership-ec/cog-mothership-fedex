@@ -56,14 +56,9 @@ class Dispatcher
 			$responseData = $client->{$request->getMethod()}($preparedRequest->getData());
 		}
 		catch (\SoapFault $e) {
-			d($e);
-			de($e->detail)->depth(5);
+			throw $e;
+			// TODO: Do stuff with this
 		}
-
-		d(
-			$client->__getLastRequest(),
-			$client->__getLastResponse()
-		)->length(-1);
 
 		// Build response object
 		$response = $request->getResponseObject();
@@ -90,7 +85,13 @@ class Dispatcher
 
 	public function getSoapClient(Service\ServiceInterface $service)
 	{
-		$client = new \SoapClient($service->getWsdlPath(), array('trace' => 1));
+		$options = array();
+
+		if ($this->_testMode) {
+			$options['trace'] = 1;
+		}
+
+		$client = new \SoapClient($service->getWsdlPath(), $options);
 
 		$client->__setLocation($service->getWsdlEndpoint($this->_testMode));
 
