@@ -29,7 +29,14 @@ interface ResponseInterface
 
 	public function getData();
 
+	/**
+	 * Validates the response data.
+	 */
 	public function validate();
 
+	/**
+	 * Initialises the response, manipulating the response data or making it
+	 * easier to access.
+	 */
 	public function init();
 }

@@ -13,7 +13,7 @@ use Message\Mothership\Fedex\Api\Document;
 class UploadDocuments extends AbstractResponse
 {
 	/**
-	 * Validates the response data.
+	 * {@inheritDoc}
 	 *
 	 * @throws Exception\ResponseException If no document statuses are returned
 	 */
@@ -28,7 +28,7 @@ class UploadDocuments extends AbstractResponse
 	}
 
 	/**
-	 * Initialise the response.
+	 * {@inheritDoc}
 	 *
 	 * This ensures the document statuses were returned as an array (if only one
 	 * document was uploaded, the statuses are not returned in an array).
