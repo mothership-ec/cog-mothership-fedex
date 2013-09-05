@@ -16,11 +16,8 @@ use Message\Cog\ValueObject\DateTimeImmutable;
  * This model also only supports generated Commercial Invoices, and no other
  * document types.
  *
- * Custom documents can also be assigned to this shipment.
+ * Custom documents can also be assigned to shipments.
  *
- * @todo Make commodity class (?)
- * @todo In populateFromDispatch, we need to make Order give us a nice way to make ItemRows from the items in a dispatch? propbably requires custom entity collections again
- * @todo Tidy up!
  * @todo Add a way to validate shipments... do this within the request? or no?
  * @todo Perhaps move the functionality in getRequestData() to another class.. ShipmentTransformer?
  *
@@ -40,15 +37,12 @@ class Shipment
 	protected $_recipientPerson;
 
 	protected $_transportationPaymentType;
+	protected $_transportationPayorAccountNumber;
+	protected $_transportationPayorCountryCode;
+
 	protected $_dutiesPaymentType;
 
 	protected $_currencyID;
-
-	//protected $_shippingChargesPayment;
-	protected $_internationalDetail;
-	protected $_labelSpecification;
-	protected $_rateRequestTypes;
-	protected $_customerReferences;
 
 	protected $_commodities = array();
 
@@ -76,9 +70,16 @@ class Shipment
 	{
 		$this->setCurrencyID($dispatch->order->currencyID);
 
-		foreach ($dispatch->items as $item) {
+		$deliveryAddress = $dispatch->order->addresses->getByType('delivery');
+
+		$this->setRecipient(
+			$deliveryAddress,
+			$deliveryAddress->getName()
+		);
+
+		foreach ($dispatch->items->getRows() as $row) {
 			$commodity = new Commodity;
-			$commodity->populateFromItem($item);
+			$commodity->populateFromItemRow($row);
 
 			$this->addCommodity($commodity);
 		}
@@ -109,9 +110,11 @@ class Shipment
 		$this->_labelSpec['stockType'] = $stockType;
 	}
 
-	public function setTransportationPaymentType($type)
+	public function setTransportationPayment($type, $accountNumber, $countryCode)
 	{
-		$this->_transportationPaymentType = $type;
+		$this->_transportationPaymentType        = $type;
+		$this->_transportationPayorAccountNumber = $accountNumber;
+		$this->_transportationPayorCountryCode   = $countryCode;
 	}
 
 	public function setDutiesPaymentType($type)
@@ -128,6 +131,14 @@ class Shipment
 
 	public function addCommodity(Commodity $commodity)
 	{
+		if ($this->_currencyID !== $commodity->currencyID) {
+			throw new \InvalidArgumentException(sprintf(
+				'Cannot add Commodity to Shipment: currency ID must match (`%s` passed; Shipment set to `%s`)',
+				$commodity->currencyID,
+				$this->_currencyID
+			));
+		}
+
 		$this->_commodities[] = $commodity;
 	}
 
@@ -136,39 +147,72 @@ class Shipment
 		$this->_documents[] = $document;
 	}
 
-	public function setShipper(Address $address, $companyName, $personName = null)
+	public function setShipper(Address $address, $personName, $companyName = null)
 	{
 		$this->_shipperAddress = $address;
-		$this->_shipperCompany = $companyName;
 		$this->_shipperPerson  = $personName;
+		$this->_shipperCompany = $companyName;
 	}
 
-	public function setRecipient(Address $address, $companyName, $personName = null)
+	public function setRecipient(Address $address, $personName, $companyName = null)
 	{
 		$this->_recipientAddress = $address;
-		$this->_recipientCompany = $companyName;
 		$this->_recipientPerson  = $personName;
+		$this->_recipientCompany = $companyName;
 	}
 
 	public function setCurrencyID($id)
 	{
-		$this->_currencyID = ('GBP' === $id) ? 'UKL' : $id;
+		$this->_currencyID = $id;
 	}
 
 	public function getInsuredValue()
 	{
-		// tot up all commodities
+		$value = 0;
+
+		foreach ($this->_commodities as $commodity) {
+			$value += $commodity->insuredValue;
+		}
+
+		return $value;
 	}
 
 	public function getCustomsValue()
 	{
-		// tot up all commodities
+		$value = 0;
+
+		foreach ($this->_commodities as $commodity) {
+			$value += $commodity->customsValue;
+		}
+
+		return $value;
+	}
+
+	public function getWeight()
+	{
+		$weight = 0;
+
+		foreach ($this->_commodities as $commodity) {
+			$weight += $commodity->weight;
+		}
+
+		return $weight < 0.5 ? 0.5 : $weight;
+	}
+
+	public function getFedexCurrencyID()
+	{
+		return 'GBP' === $this->_currencyID ? 'UKL' : $this->_currencyID;
+	}
+
+	public function getRecipientAddress()
+	{
+		return $this->_recipientAddress;
 	}
 
 	public function getRequestData()
 	{
 		$data = array(
-			'ShipTimestamp' => $this->_shipAt->getTimestamp(),
+			'ShipTimestamp' => $this->_shipAt->format(\DateTime::ATOM),
 			'DropoffType'   => 'REGULAR_PICKUP', // valid values REGULAR_PICKUP, REQUEST_COURIER, DROP_BOX, BUSINESS_SERVICE_CENTER and STATION
 			'ServiceType'   => $this->_serviceType,
 			'PackagingType' => 'YOUR_PACKAGING', // valid values FEDEX_BOK, FEDEX_PAK, FEDEX_TUBE, YOUR_PACKAGING, ...
@@ -179,8 +223,8 @@ class Shipment
 					'PhoneNumber' => $this->_shipperAddress->telephone,
 				),
 				'Address' => array(
-					'StreetLines'         => $this->_shipperAddress->lines,
-					'City'                => $this->_shipperAddress->city,
+					'StreetLines'         => $this->_convertAddressLines($this->_shipperAddress->lines),
+					'City'                => $this->_shipperAddress->town,
 					'StateOrProvinceCode' => $this->_shipperAddress->stateID,
 					'PostalCode'          => $this->_shipperAddress->postcode,
 					'CountryCode'         => $this->_shipperAddress->countryID,
@@ -193,8 +237,8 @@ class Shipment
 					'PhoneNumber' => $this->_recipientAddress->telephone,
 				),
 				'Address' => array(
-					'StreetLines'         => $this->_recipientAddress->lines,
-					'City'                => $this->_recipientAddress->city,
+					'StreetLines'         => $this->_convertAddressLines($this->_recipientAddress->lines),
+					'City'                => $this->_recipientAddress->town,
 					'StateOrProvinceCode' => $this->_recipientAddress->stateID,
 					'PostalCode'          => $this->_recipientAddress->postcode,
 					'CountryCode'         => $this->_recipientAddress->countryID,
@@ -203,10 +247,10 @@ class Shipment
 			),
 			'ShippingChargesPayment' => array(
 				'PaymentType' => $this->_transportationPaymentType,
-				// 'Payor' => array(
-				// 	'AccountNumber' => null, // Replace 'XXX' with payors account number
-				// 	'CountryCode'   => 'GB',
-				// )
+				'Payor' => array(
+					'AccountNumber' => $this->_transportationPayorAccountNumber,
+					'CountryCode'   => $this->_transportationPayorCountryCode,
+				)
 			),
 			'InternationalDetail' => array(
 				'DutiesPayment' => array(
@@ -214,7 +258,7 @@ class Shipment
 				),
 				'CustomsValue' => array(
 					'Amount'   => $this->getCustomsValue(),
-					'Currency' => $this->_currencyID,
+					'Currency' => $this->getFedexCurrencyID(),
 				),
 				'Commodities'  => array(),
 			),
@@ -233,7 +277,7 @@ class Shipment
 				),
 				'InsuredValue' => array(
 					'Amount'   => $this->getInsuredValue(),
-					'Currency' => $this->_currencyID,
+					'Currency' => $this->getFedexCurrencyID(),
 				)
 			),
 			'CustomerReferences' => array(),
@@ -244,6 +288,33 @@ class Shipment
 			$data['Shipper']['Tins'] = array(
 				'TinType' => $this->_tin['type'],
 				'Number'  => $this->_tin['number'],
+			);
+		}
+
+		// Set commodities
+		foreach ($this->_commodities as $commodity) {
+			$data['InternationalDetail']['Commodities'][] = array(
+				'NumberOfPieces'       => $commodity->quantity,
+				'Description'          => $commodity->description,
+				'CountryOfManufacture' => $commodity->manufactureCountryID,
+				'Weight'               => array(
+					'Value' => $commodity->weight / 1000,
+					'Units' => 'KG'
+				),
+				'Quantity'             => $commodity->quantity,
+				'QuantityUnits'        => 'EA',
+				'UnitPrice'            => array(
+					'Amount'   => $commodity->price,
+					'Currency' => $this->getFedexCurrencyID(),
+				),
+				'CustomsValue'         => array(
+					'Amount'   => $commodity->customsValue,
+					'Currency' => $this->getFedexCurrencyID(),
+				),
+				'InsuredValue'         => array(
+					'Amount'   => $commodity->insuredValue,
+					'Currency' => $this->getFedexCurrencyID(),
+				)
 			);
 		}
 
@@ -264,7 +335,7 @@ class Shipment
 					'TermsOfSale' => $this->_termsOfSale,
 				),
 				'CustomsValue' => array(
-					'Currency' => $this->_currencyID,
+					'Currency' => $this->getFedexCurrencyID(),
 					'Amount'   => $this->getCustomsValue(),
 				),
 				'Commodities'  => $data['InternationalDetail']['Commodities'],
@@ -300,8 +371,17 @@ class Shipment
 			}
 		}
 
-		// Set commodities
-
 		return $data;
+	}
+
+	protected function _convertAddressLines(array $lines)
+	{
+		$lines = array_filter($lines);
+		$return = array();
+
+		$return[] = array_shift($lines);
+		$return[] = implode(', ', $lines);
+
+		return $return;
 	}
 }
