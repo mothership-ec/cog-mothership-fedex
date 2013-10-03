@@ -78,13 +78,16 @@ class OrderListener extends BaseListener implements SubscriberInterface
 		// Stupid workaround because file_put_contents doesn't freakin' work with streams
 		$manager = $this->get('filesystem.stream_wrapper_manager');
 		$handler = $manager::getHandler('cog');
+		$cogPath = $path;
 		$path    = $handler->getLocalPath($path);
 
 		$this->get('filesystem')->dumpFile($path, $response->getLabelData());
 
 		$document       = new Order\Entity\Document\Document;
 		$document->type = 'dispatch-label';
-		$document->file = new File($path);
+
+		// Create the file from the cog path to ensure it is stored with that reference
+		$document->file = new File($cogPath);
 
 		$event->addDocument($document);
 	}
