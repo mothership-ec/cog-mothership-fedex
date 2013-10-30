@@ -36,7 +36,7 @@ class Commodity
 		$product = $row->first()->getProduct();
 
 		$this->quantity             = $row->count();
-		$this->description          = $product->exportDescription;
+		$this->description          = $product ? $product->exportDescription : null;
 		$this->manufactureCountryID = $product ? $product->exportManufactureCountryID : null;
 		$this->weight               = $row->sum('weight');
 		$this->currencyID           = $row->first()->order->currencyID;
