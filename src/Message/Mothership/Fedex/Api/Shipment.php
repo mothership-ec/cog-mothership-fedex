@@ -38,6 +38,9 @@ class Shipment
 
 	protected $_transportationPaymentType;
 	protected $_transportationPayorAccountNumber;
+	protected $_transportationPayorAddress;
+	protected $_transportationPayorPersonName;
+	protected $_transportationPayorCompanyName;
 
 	protected $_purpose;
 	protected $_customsOptionType;
@@ -126,10 +129,13 @@ class Shipment
 		$this->_labelSpec['stockType'] = $stockType;
 	}
 
-	public function setTransportationPayment($type, $accountNumber)
+	public function setTransportationPayment($type, $accountNumber, $personName, $companyName = null, Address $address = null)
 	{
 		$this->_transportationPaymentType        = $type;
 		$this->_transportationPayorAccountNumber = $accountNumber;
+		$this->_transportationPayorAddress       = $address;
+		$this->_transportationPayorPersonName    = $personName;
+		$this->_transportationPayorCompanyName   = $companyName;
 	}
 
 	public function setDutiesPaymentType($type)
@@ -327,9 +333,9 @@ class Shipment
 					'ResponsibleParty' => array(
 						'AccountNumber' => $this->_transportationPayorAccountNumber,
 						'Contact' => array(
-							'PersonName'  => $this->_shipperPerson,
-							'CompanyName' => $this->_shipperCompany,
-							'PhoneNumber' => $this->_shipperAddress->telephone,
+							'PersonName'  => $this->_transportationPayorPersonName,
+							'CompanyName' => $this->_transportationPayorCompanyName,
+							'PhoneNumber' => $this->_transportationPayorAddress ? $this->__transportationPayorAddress->telephone : null,
 						),
 					),
 				)
@@ -364,6 +370,17 @@ class Shipment
 			),
 			'CustomerReferences' => array(),
 		);
+
+		if ($this->_transportationPayorAddress) {
+			$data['ShippingChargesPayment']['Payor']['ResponsibleParty'] = array(
+				'StreetLines'         => $this->_convertAddressLines($this->_transportationPayorAddress->lines),
+				'City'                => $this->_transportationPayorAddress->town,
+				'StateOrProvinceCode' => $this->_transportationPayorAddress->stateID,
+				'PostalCode'          => $this->_transportationPayorAddress->postcode,
+				'CountryCode'         => $this->_transportationPayorAddress->countryID,
+				'Residential'         => isset($this->_transportationCompanyName) && !empty($this->_transportationCompanyName),
+			);
+		}
 
 		// If defined, set the tax identification number
 		if ($this->_tin) {
