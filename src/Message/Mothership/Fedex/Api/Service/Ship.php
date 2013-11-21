@@ -14,7 +14,7 @@ class Ship implements ServiceInterface
 	 */
 	public function getWsdlPath()
 	{
-		return 'cog://@Message:Mothership:Fedex::resources/wsdl/Ship/10.0.0.wsdl';
+		return 'cog://@Message:Mothership:Fedex::resources/wsdl/Ship/13.0.0.wsdl';
 	}
 
 	/**
@@ -32,7 +32,7 @@ class Ship implements ServiceInterface
 	 */
 	public function getVersion()
 	{
-		return '10.0.0';
+		return '13.0.0';
 	}
 
 	/**
