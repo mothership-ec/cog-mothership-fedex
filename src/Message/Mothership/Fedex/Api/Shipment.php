@@ -61,6 +61,8 @@ class Shipment
 		'stockType' => null,
 	);
 
+	protected $_dispatch;
+
 	public function __construct()
 	{
 		$this->_shipAt = new DateTimeImmutable;
@@ -83,6 +85,13 @@ class Shipment
 
 			$this->addCommodity($commodity);
 		}
+
+		$this->_dispatch = $dispatch;
+	}
+
+	public function getDispatch()
+	{
+		return $this->_dispatch;
 	}
 
 	public function setServiceType($type)
