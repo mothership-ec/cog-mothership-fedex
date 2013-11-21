@@ -38,7 +38,6 @@ class Shipment
 
 	protected $_transportationPaymentType;
 	protected $_transportationPayorAccountNumber;
-	protected $_transportationPayorCountryCode;
 
 	protected $_purpose;
 	protected $_customsOptionType;
@@ -127,11 +126,10 @@ class Shipment
 		$this->_labelSpec['stockType'] = $stockType;
 	}
 
-	public function setTransportationPayment($type, $accountNumber, $countryCode)
+	public function setTransportationPayment($type, $accountNumber)
 	{
 		$this->_transportationPaymentType        = $type;
 		$this->_transportationPayorAccountNumber = $accountNumber;
-		$this->_transportationPayorCountryCode   = $countryCode;
 	}
 
 	public function setDutiesPaymentType($type)
