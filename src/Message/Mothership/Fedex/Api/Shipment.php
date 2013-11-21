@@ -41,6 +41,7 @@ class Shipment
 	protected $_transportationPayorCountryCode;
 
 	protected $_purpose;
+	protected $_customsOptionType;
 
 	protected $_dutiesPaymentType;
 
@@ -140,7 +141,7 @@ class Shipment
 
 	public function setPurpose($purpose)
 	{
-		$allowedPurposes = array(
+		$allowed = array(
 			'GIFT',
 			'NOT_SOLD',
 			'PERSONAL_EFFECTS',
@@ -158,6 +159,32 @@ class Shipment
 		}
 
 		$this->_purpose = $purpose;
+	}
+
+	public function setCustomsOptionType($type)
+	{
+		$allowed = array(
+			'COURTESY_RETURN_LABEL',
+			'EXHIBITION_TRADE_SHOW',
+			'FAULTY_ITEM',
+			'FOLLOWING_REPAIR',
+			'FOR_REPAIR',
+			'ITEM_FOR_LOAN',
+			'OTHER',
+			'REJECTED',
+			'REPLACEMENT',
+			'TRIAL',
+		);
+
+		if (!in_array($type, $allowed)) {
+			throw new \InvalidArgumentException(sprintf(
+				'Invalid shipment customs option type: `%s`. Allowed values: `%s`',
+				$type,
+				implode('`, `', $type)
+			));
+		}
+
+		$this->_customsOptionType = $type;
 	}
 
 	public function requestGeneratedCommercialInvoice($bool = true)
@@ -394,6 +421,10 @@ class Shipment
 
 			if ($this->_purpose) {
 				$data['CustomsClearanceDetail']['CommercialInvoice']['Purpose'] = $this->_purpose;
+			}
+
+			if ($this->_customsOptionType) {
+				$data['CustomsClearanceDetail']['CustomsOptionType'] = $this->_customsOptionType;
 			}
 
 			$data['ShippingDocumentSpecification'] = array(
