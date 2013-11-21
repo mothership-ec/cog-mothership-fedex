@@ -70,7 +70,7 @@ class Services implements ServicesInterface
 			// Set payment types
 			$shipment->setTransportationPayment(
 				$c['cfg']->fedex->payment->transportation->type,
-				$c['cfg']->fedex->payment->transportation->accountNumber,
+				$c['cfg']->fedex->payment->transportation->accountNumber
 			);
 			$shipment->setDutiesPaymentType($c['cfg']->fedex->payment->duties->type);
 
