@@ -326,8 +326,14 @@ class Shipment
 			'ShippingChargesPayment' => array(
 				'PaymentType' => $this->_transportationPaymentType,
 				'Payor' => array(
-					'AccountNumber' => $this->_transportationPayorAccountNumber,
-					'CountryCode'   => $this->_transportationPayorCountryCode,
+					'ResponsibleParty' => array(
+						'AccountNumber' => $this->_transportationPayorAccountNumber,
+						'Contact' => array(
+							'PersonName'  => $this->_shipperPerson,
+							'CompanyName' => $this->_shipperCompany,
+							'PhoneNumber' => $this->_shipperAddress->telephone,
+						),
+					),
 				)
 			),
 			'InternationalDetail' => array(
