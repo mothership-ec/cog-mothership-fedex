@@ -94,6 +94,11 @@ class Shipment
 		return $this->_dispatch;
 	}
 
+	public function getCommodities()
+	{
+		return $this->_commodities;
+	}
+
 	public function setServiceType($type)
 	{
 		$this->_serviceType = $type;
