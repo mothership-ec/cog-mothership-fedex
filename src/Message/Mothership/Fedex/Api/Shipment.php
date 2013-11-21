@@ -335,7 +335,7 @@ class Shipment
 						'Contact' => array(
 							'PersonName'  => $this->_transportationPayorPersonName,
 							'CompanyName' => $this->_transportationPayorCompanyName,
-							'PhoneNumber' => $this->_transportationPayorAddress ? $this->__transportationPayorAddress->telephone : null,
+							'PhoneNumber' => $this->_transportationPayorAddress ? $this->_transportationPayorAddress->telephone : null,
 						),
 					),
 				)
@@ -372,7 +372,7 @@ class Shipment
 		);
 
 		if ($this->_transportationPayorAddress) {
-			$data['ShippingChargesPayment']['Payor']['ResponsibleParty'] = array(
+			$data['ShippingChargesPayment']['Payor']['ResponsibleParty']['Address'] = array(
 				'StreetLines'         => $this->_convertAddressLines($this->_transportationPayorAddress->lines),
 				'City'                => $this->_transportationPayorAddress->town,
 				'StateOrProvinceCode' => $this->_transportationPayorAddress->stateID,
