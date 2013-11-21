@@ -149,11 +149,11 @@ class Shipment
 			'SOLD',
 		);
 
-		if (!in_array($purpose, $allowedPurposes)) {
+		if (!in_array($purpose, $allowed)) {
 			throw new \InvalidArgumentException(sprintf(
 				'Invalid shipment purpose: `%s`. Allowed values: `%s`',
 				$purpose,
-				implode('`, `', $allowedPurposes)
+				implode('`, `', $allowed)
 			));
 		}
 
