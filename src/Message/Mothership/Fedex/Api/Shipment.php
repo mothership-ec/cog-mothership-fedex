@@ -40,6 +40,8 @@ class Shipment
 	protected $_transportationPayorAccountNumber;
 	protected $_transportationPayorCountryCode;
 
+	protected $_purpose;
+
 	protected $_dutiesPaymentType;
 
 	protected $_currencyID;
@@ -134,6 +136,28 @@ class Shipment
 	public function setDutiesPaymentType($type)
 	{
 		$this->_dutiesPaymentType = $type;
+	}
+
+	public function setPurpose($purpose)
+	{
+		$allowedPurposes = array(
+			'GIFT',
+			'NOT_SOLD',
+			'PERSONAL_EFFECTS',
+			'REPAIR_AND_RETURN',
+			'SAMPLE',
+			'SOLD',
+		);
+
+		if (!in_array($purpose, $allowedPurposes)) {
+			throw new \InvalidArgumentException(sprintf(
+				'Invalid shipment purpose: `%s`. Allowed values: `%s`',
+				$purpose,
+				implode('`, `', $allowedPurposes)
+			));
+		}
+
+		$this->_purpose = $purpose;
 	}
 
 	public function requestGeneratedCommercialInvoice($bool = true)
@@ -367,6 +391,10 @@ class Shipment
 				),
 				'Commodities'  => $data['InternationalDetail']['Commodities'],
 			);
+
+			if ($this->_purpose) {
+				$data['CustomsClearanceDetail']['CommercialInvoice']['Purpose'] = $this->_purpose;
+			}
 
 			$data['ShippingDocumentSpecification'] = array(
 				'ShippingDocumentTypes' => 'COMMERCIAL_INVOICE',
