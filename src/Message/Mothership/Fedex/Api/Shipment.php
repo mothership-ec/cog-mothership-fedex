@@ -211,6 +211,15 @@ class Shipment
 		$this->_commodities[] = $commodity;
 	}
 
+	public function setCommodities(array $commodities)
+	{
+		$this->_commodities = array();
+
+		foreach ($commodities as $commodity) {
+			$this->addCommodity($commodity);
+		}
+	}
+
 	public function addDocument(Document $document)
 	{
 		$this->_documents[] = $document;
