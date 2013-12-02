@@ -8,7 +8,6 @@ payment:
   transportation:
     type: SENDER
     account-number: 510087569
-    country-code: GB
   duties:
     type: RECIPIENT
 label:
