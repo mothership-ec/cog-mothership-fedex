@@ -21,7 +21,7 @@ class Dispatcher
 
 	public function __construct(PreparedRequest $preparedRequest, EventDispatcher $eventDispatcher)
 	{
-		$this->_preparedRequest  = $preparedRequest;
+		$this->_preparedRequest = $preparedRequest;
 		$this->_eventDispatcher = $eventDispatcher;
 	}
 

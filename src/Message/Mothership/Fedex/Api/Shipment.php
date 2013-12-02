@@ -38,7 +38,12 @@ class Shipment
 
 	protected $_transportationPaymentType;
 	protected $_transportationPayorAccountNumber;
-	protected $_transportationPayorCountryCode;
+	protected $_transportationPayorAddress;
+	protected $_transportationPayorPersonName;
+	protected $_transportationPayorCompanyName;
+
+	protected $_purpose;
+	protected $_customsOptionType;
 
 	protected $_dutiesPaymentType;
 
@@ -60,6 +65,8 @@ class Shipment
 		'imgType'   => 'PDF',
 		'stockType' => null,
 	);
+
+	protected $_dispatch;
 
 	public function __construct()
 	{
@@ -83,6 +90,18 @@ class Shipment
 
 			$this->addCommodity($commodity);
 		}
+
+		$this->_dispatch = $dispatch;
+	}
+
+	public function getDispatch()
+	{
+		return $this->_dispatch;
+	}
+
+	public function getCommodities()
+	{
+		return $this->_commodities;
 	}
 
 	public function setServiceType($type)
@@ -110,16 +129,66 @@ class Shipment
 		$this->_labelSpec['stockType'] = $stockType;
 	}
 
-	public function setTransportationPayment($type, $accountNumber, $countryCode)
+	public function setTransportationPayment($type, $accountNumber, $personName, $companyName = null, Address $address = null)
 	{
 		$this->_transportationPaymentType        = $type;
 		$this->_transportationPayorAccountNumber = $accountNumber;
-		$this->_transportationPayorCountryCode   = $countryCode;
+		$this->_transportationPayorAddress       = $address;
+		$this->_transportationPayorPersonName    = $personName;
+		$this->_transportationPayorCompanyName   = $companyName;
 	}
 
 	public function setDutiesPaymentType($type)
 	{
 		$this->_dutiesPaymentType = $type;
+	}
+
+	public function setPurpose($purpose)
+	{
+		$allowed = array(
+			'GIFT',
+			'NOT_SOLD',
+			'PERSONAL_EFFECTS',
+			'REPAIR_AND_RETURN',
+			'SAMPLE',
+			'SOLD',
+		);
+
+		if (!in_array($purpose, $allowed)) {
+			throw new \InvalidArgumentException(sprintf(
+				'Invalid shipment purpose: `%s`. Allowed values: `%s`',
+				$purpose,
+				implode('`, `', $allowed)
+			));
+		}
+
+		$this->_purpose = $purpose;
+	}
+
+	public function setCustomsOptionType($type)
+	{
+		$allowed = array(
+			'COURTESY_RETURN_LABEL',
+			'EXHIBITION_TRADE_SHOW',
+			'FAULTY_ITEM',
+			'FOLLOWING_REPAIR',
+			'FOR_REPAIR',
+			'ITEM_FOR_LOAN',
+			'OTHER',
+			'REJECTED',
+			'REPLACEMENT',
+			'TRIAL',
+		);
+
+		if (!in_array($type, $allowed)) {
+			throw new \InvalidArgumentException(sprintf(
+				'Invalid shipment customs option type: `%s`. Allowed values: `%s`',
+				$type,
+				implode('`, `', $type)
+			));
+		}
+
+		$this->_customsOptionType = $type;
 	}
 
 	public function requestGeneratedCommercialInvoice($bool = true)
@@ -140,6 +209,15 @@ class Shipment
 		}
 
 		$this->_commodities[] = $commodity;
+	}
+
+	public function setCommodities(array $commodities)
+	{
+		$this->_commodities = array();
+
+		foreach ($commodities as $commodity) {
+			$this->addCommodity($commodity);
+		}
 	}
 
 	public function addDocument(Document $document)
@@ -261,8 +339,14 @@ class Shipment
 			'ShippingChargesPayment' => array(
 				'PaymentType' => $this->_transportationPaymentType,
 				'Payor' => array(
-					'AccountNumber' => $this->_transportationPayorAccountNumber,
-					'CountryCode'   => $this->_transportationPayorCountryCode,
+					'ResponsibleParty' => array(
+						'AccountNumber' => $this->_transportationPayorAccountNumber,
+						'Contact' => array(
+							'PersonName'  => $this->_transportationPayorPersonName,
+							'CompanyName' => $this->_transportationPayorCompanyName,
+							'PhoneNumber' => $this->_transportationPayorAddress ? $this->_transportationPayorAddress->telephone : null,
+						),
+					),
 				)
 			),
 			'InternationalDetail' => array(
@@ -295,6 +379,17 @@ class Shipment
 			),
 			'CustomerReferences' => array(),
 		);
+
+		if ($this->_transportationPayorAddress) {
+			$data['ShippingChargesPayment']['Payor']['ResponsibleParty']['Address'] = array(
+				'StreetLines'         => $this->_convertAddressLines($this->_transportationPayorAddress->lines),
+				'City'                => $this->_transportationPayorAddress->town,
+				'StateOrProvinceCode' => $this->_transportationPayorAddress->stateID,
+				'PostalCode'          => $this->_transportationPayorAddress->postcode,
+				'CountryCode'         => $this->_transportationPayorAddress->countryID,
+				'Residential'         => isset($this->_transportationCompanyName) && !empty($this->_transportationCompanyName),
+			);
+		}
 
 		// If defined, set the tax identification number
 		if ($this->_tin) {
@@ -353,6 +448,14 @@ class Shipment
 				),
 				'Commodities'  => $data['InternationalDetail']['Commodities'],
 			);
+
+			if ($this->_purpose) {
+				$data['CustomsClearanceDetail']['CommercialInvoice']['Purpose'] = $this->_purpose;
+			}
+
+			if ($this->_customsOptionType) {
+				$data['CustomsClearanceDetail']['CustomsOptionType'] = $this->_customsOptionType;
+			}
 
 			$data['ShippingDocumentSpecification'] = array(
 				'ShippingDocumentTypes' => 'COMMERCIAL_INVOICE',
