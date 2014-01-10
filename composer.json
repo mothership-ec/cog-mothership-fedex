@@ -15,9 +15,9 @@
 		"issues": "http://github.com/messagedigital/cog-mothership-fedex/issues"
 	},
 	"autoload": {
-		"psr-0": {
-			"Message\\Mothership\\Fedex"      : "src",
-			"Message\\Mothership\\Fedex\\Test": "tests"
+		"psr-4": {
+			"Message\\Mothership\\Fedex\\"      : "src",
+			"Message\\Mothership\\Fedex\\Test\\": "tests"
 		}
 	},
 	"repositories": [
@@ -27,14 +27,9 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3.0",
+		"php": ">=5.4.0",
 
-		"message/cog"                     : "1.*",
-		"message/cog-mothership-ecommerce": "1.*"
-	},
-	"extra": {
-		"branch-alias": {
-			"dev-master": "1.0.x-dev"
-		}
+		"message/cog"                     : "~2.0",
+		"message/cog-mothership-ecommerce": "~1.0"
 	}
 }
