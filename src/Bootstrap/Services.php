@@ -15,17 +15,17 @@ use Message\Cog\Bootstrap\ServicesInterface;
  */
 class Services implements ServicesInterface
 {
-	public function registerServices($container)
+	public function registerServices($services)
 	{
 		// Add dispatch methods
-		$container['order.dispatch.methods'] = $container->share($container->extend('order.dispatch.methods', function($methods) {
+		$services['order.dispatch.methods'] = $services->extend('order.dispatch.methods', function($methods) {
 			$methods->add(new Fedex\DispatchMethod\FedexExpress);
 			$methods->add(new Fedex\DispatchMethod\FedexUk);
 
 			return $methods;
-		}));
+		});
 
-		$container['fedex.api.prepared_request'] = function($c) {
+		$services['fedex.api.prepared_request'] = $services->factory(function($c) {
 			$cfg     = $c['cfg']->fedex;
 			$request = new Fedex\Api\PreparedRequest;
 
@@ -34,17 +34,17 @@ class Services implements ServicesInterface
 			$request->setMeterNumber($cfg->meterNumber);
 
 			return $request;
-		};
+		});
 
-		$container['fedex.api.dispatcher'] = function($c) {
+		$services['fedex.api.dispatcher'] = $services->factory(function($c) {
 			$dispatcher = new Fedex\Api\Dispatcher($c['fedex.api.prepared_request'], $c['event.dispatcher']);
 
 			$dispatcher->setTestMode($c['cfg']->fedex->testMode);
 
 			return $dispatcher;
-		};
+		});
 
-		$container['fedex.api.shipment'] = function($c) {
+		$services['fedex.api.shipment'] = $services->factory(function($c) {
 			$shipment = new Fedex\Api\Shipment;
 
 			// Create Address object for merchant address
@@ -88,6 +88,6 @@ class Services implements ServicesInterface
 			);
 
 			return $shipment;
-		};
+		});
 	}
 }
