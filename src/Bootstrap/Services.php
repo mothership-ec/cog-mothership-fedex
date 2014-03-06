@@ -18,7 +18,7 @@ class Services implements ServicesInterface
 	public function registerServices($services)
 	{
 		// Add dispatch methods
-		$services['order.dispatch.methods'] = $services->extend('order.dispatch.methods', function($methods) {
+		$services->extend('order.dispatch.methods', function($methods) {
 			$methods->add(new Fedex\DispatchMethod\FedexExpress);
 			$methods->add(new Fedex\DispatchMethod\FedexUk);
 
