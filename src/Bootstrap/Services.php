@@ -15,6 +15,9 @@ use Message\Cog\Bootstrap\ServicesInterface;
  */
 class Services implements ServicesInterface
 {
+	/**
+	 * {@inheritDoc}
+	 */
 	public function registerServices($services)
 	{
 		// Add dispatch methods

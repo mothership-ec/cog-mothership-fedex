@@ -19,17 +19,41 @@ class Dispatcher
 
 	protected $_testMode = false;
 
+	/**
+	 * Constructor
+	 *
+	 * @param PreparedRequest $preparedRequest Prototype for a prepared request
+	 *                                         that will be cloned for each
+	 *                                         request
+	 * @param EventDispatcher $eventDispatcher The event dispatcher
+	 */
 	public function __construct(PreparedRequest $preparedRequest, EventDispatcher $eventDispatcher)
 	{
 		$this->_preparedRequest = $preparedRequest;
 		$this->_eventDispatcher = $eventDispatcher;
 	}
 
+	/**
+	 * Enable or disable test mode.
+	 *
+	 * @param boolean $bool True to enable, false to disable
+	 */
 	public function setTestMode($bool = true)
 	{
 		$this->_testMode = (bool) $bool;
 	}
 
+	/**
+	 * Dispatch a request and return the response
+	 *
+	 * @param  Request\RequestInterface $request The request to dispatch
+	 *
+	 * @return Response\ResponseInterface        The response to the request
+	 *
+	 * @throws \SoapFault if a soap fault occurs
+	 * @throws Exception\ResponseErrorException If an error-level notification
+	 *                                          is returned
+	 */
 	public function dispatch(Request\RequestInterface $request)
 	{
 		// TODO: log !
@@ -83,6 +107,13 @@ class Dispatcher
 		return $response;
 	}
 
+	/**
+	 * Get the soap client for a given service.
+	 *
+	 * @param  Service\ServiceInterface $service
+	 *
+	 * @return \SoapClient
+	 */
 	public function getSoapClient(Service\ServiceInterface $service)
 	{
 		$options = array();
