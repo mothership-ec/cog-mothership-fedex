@@ -4,13 +4,15 @@ api-password:
 meter-number:
 account-number:
 terms-of-sale: DDU
+service-type: INTERNATIONAL_PRIORITY
 payment:
   transportation:
     type: SENDER
     account-number: 510087569
+    country-code: GB
   duties:
     type: RECIPIENT
 label:
   format: COMMON2D
-  image-type: PDF
-  stock-type:
+  image-type: EPL2
+  stock-type: STOCK_4X6.75_LEADING_DOC_TAB
