@@ -35,7 +35,7 @@ It is important to note that there is no integration with FedEx UK as they are a
 
 ## API
 
-This cogule contains a small library for interacting with FedEx's SOAP API. 
+This cogule contains a small library for interacting with FedEx's SOAP API.
 
 ### Configuration
 
@@ -86,9 +86,3 @@ To do so, just call `requestGeneratedCommercialInvoice(true)` on your `Shipment`
 Each service needs its own `.wsdl` file supplied by FedEx on their [developer website](http://fedex.com/developer). These are stored in `/resources/wsdl` and are referenced by their relevant service classes (instances of `Message\Mothership\Fedex\Api\Service\ServiceInterface`).
 
 The endpoints are automatically changed by the API subsystem depending on the value of the `test-mode` property on the `fedex` configuration group. The endpoint for both live and test must be set on the service class in the `getWsdlEndpoint()` method. When adding a new service or `.wsdl` file, you can get these endpoints by looking at the bottom of the file and finding the value of the `location` attribute in service->port->address. The live URI will be on the `ws.fedex.com` host and test URIs will be on the `wsbeta.fedex.com` host.
-
-## Todo
-
-- Log requests and responses to the API using the events
-- Catch SoapFault's ?
-- Provide a way to set the transaction ID for a request? (new method?)
