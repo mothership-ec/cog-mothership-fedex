@@ -41,7 +41,7 @@ class Shipment
 	protected $_transportationPayorAddress;
 	protected $_transportationPayorPersonName;
 	protected $_transportationPayorCompanyName;
-
+	protected $_companyCurrency;
 	protected $_purpose;
 	protected $_customsOptionType;
 
@@ -71,9 +71,10 @@ class Shipment
 	/**
 	 * Constructor.
 	 */
-	public function __construct()
+	public function __construct($currency)
 	{
 		$this->_shipAt = new DateTimeImmutable;
+		$this->_companyCurrency = $currency;
 	}
 
 	/**
@@ -446,6 +447,11 @@ class Shipment
 		return 'GBP' === $this->_currencyID ? 'UKL' : $this->_currencyID;
 	}
 
+	public function getCompanyCurrencyID()
+	{
+		return 'GBP' === $this->_currencyID ? 'UKL' : $this->_companyCurrency;
+	}
+
 	/**
 	 * Get the recipient's address.
 	 *
@@ -534,7 +540,7 @@ class Shipment
 				),
 				'CustomsValue' => array(
 					'Amount'   => $this->getCustomsValue(),
-					'Currency' => $this->getFedexCurrencyID(),
+					'Currency' => $this->getCompanyCurrencyID(),
 				),
 				'Commodities'  => array(),
 			),
@@ -553,7 +559,7 @@ class Shipment
 				),
 				'InsuredValue' => array(
 					'Amount'   => $this->getInsuredValue(),
-					'Currency' => $this->getFedexCurrencyID(),
+					'Currency' => $this->getCompanyCurrencyID(),
 				)
 			),
 			'CustomerReferences' => array(),
@@ -596,11 +602,11 @@ class Shipment
 				),
 				'CustomsValue'         => array(
 					'Amount'   => $commodity->customsValue,
-					'Currency' => $this->getFedexCurrencyID(),
+					'Currency' => $this->getCompanyCurrencyID(),
 				),
 				'InsuredValue'         => array(
 					'Amount'   => $commodity->insuredValue,
-					'Currency' => $this->getFedexCurrencyID(),
+					'Currency' => $this->getCompanyCurrencyID(),
 				)
 			);
 		}
@@ -622,7 +628,7 @@ class Shipment
 					'TermsOfSale' => $this->_termsOfSale,
 				),
 				'CustomsValue' => array(
-					'Currency' => $this->getFedexCurrencyID(),
+					'Currency' => $this->getCompanyCurrencyID(),
 					'Amount'   => $this->getCustomsValue(),
 				),
 				'Commodities'  => $data['InternationalDetail']['Commodities'],
