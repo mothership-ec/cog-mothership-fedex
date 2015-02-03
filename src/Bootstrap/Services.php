@@ -15,6 +15,9 @@ use Message\Cog\Bootstrap\ServicesInterface;
  */
 class Services implements ServicesInterface
 {
+	/**
+	 * {@inheritDoc}
+	 */
 	public function registerServices($services)
 	{
 		// Add dispatch methods
@@ -45,7 +48,7 @@ class Services implements ServicesInterface
 		});
 
 		$services['fedex.api.shipment'] = $services->factory(function($c) {
-			$shipment = new Fedex\Api\Shipment;
+			$shipment = new Fedex\Api\Shipment($c['currency.company']);
 
 			// Create Address object for merchant address
 			$shipperAddress = new Address;

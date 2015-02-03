@@ -41,7 +41,7 @@ class Shipment
 	protected $_transportationPayorAddress;
 	protected $_transportationPayorPersonName;
 	protected $_transportationPayorCompanyName;
-
+	protected $_companyCurrency;
 	protected $_purpose;
 	protected $_customsOptionType;
 
@@ -68,11 +68,25 @@ class Shipment
 
 	protected $_dispatch;
 
-	public function __construct()
+	/**
+	 * Constructor.
+	 */
+	public function __construct($currency)
 	{
 		$this->_shipAt = new DateTimeImmutable;
+		$this->_companyCurrency = $currency;
 	}
 
+	/**
+	 * Populate this shipment from an order dispatch.
+	 *
+	 * The delivery address and recipient details are set from the order, and
+	 * the commodities are set from the items in the dispatch.
+	 *
+	 * @param  Dispatch $dispatch The dispatch to populate from
+	 *
+	 * @return Shipment           Implements a fluent interface
+	 */
 	public function populateFromDispatch(Dispatch $dispatch)
 	{
 		$this->setCurrencyID($dispatch->order->currencyID);
@@ -92,23 +106,48 @@ class Shipment
 		}
 
 		$this->_dispatch = $dispatch;
+
+		return $this;
 	}
 
+	/**
+	 * Get the dispatch set for this shipment. This is only set when the
+	 * shipment was set up using `populateFromDispatch()`.
+	 *
+	 * @return Dispatch|null
+	 */
 	public function getDispatch()
 	{
 		return $this->_dispatch;
 	}
 
+	/**
+	 * Get the commodities set on this shipment.
+	 *
+	 * @return array[Commodity]
+	 */
 	public function getCommodities()
 	{
 		return $this->_commodities;
 	}
 
+	/**
+	 * Set the service type for this shipment.
+	 *
+	 * @param string $type Service type identifier as defined in FedEx API docs
+	 */
 	public function setServiceType($type)
 	{
 		$this->_serviceType = $type;
 	}
 
+	/**
+	 * Set tax identification number.
+	 *
+	 * @param string $number The tax identification number
+	 * @param string $type   The TIN type identifier as defined in the FedEx API
+	 *                       docs
+	 */
 	public function setTin($number, $type = 'BUSINESS_NATIONAL')
 	{
 		$this->_tin = array(
@@ -117,11 +156,24 @@ class Shipment
 		);
 	}
 
+	/**
+	 * Set the terms of sale for this shipment (DDU or DDP).
+	 *
+	 * @param string $terms The terms of sale (DDU or DDP)
+	 */
 	public function setTermsOfSale($terms)
 	{
 		$this->_termsOfSale = $terms;
 	}
 
+	/**
+	 * Set the specification for the returned shipment label.
+	 *
+	 * @param string $format    The format for the label (see FedEx API docs)
+	 * @param string $imgType   The image type for the label (see FedEx API docs)
+	 * @param string $stockType The type of stock used for printing the label
+	 *                          (see FedEx API docs)
+	 */
 	public function setLabelSpec($format, $imgType = null, $stockType = null)
 	{
 		$this->_labelSpec['format']    = $format;
@@ -129,6 +181,16 @@ class Shipment
 		$this->_labelSpec['stockType'] = $stockType;
 	}
 
+	/**
+	 * Set the transportation payment details (who/what pays for the shipment's
+	 * transportation).
+	 *
+	 * @param string  $type          Transportation payment type (eg. SHIPPER)
+	 * @param string  $accountNumber Account number for account who is paying
+	 * @param string  $personName    Name of the person who is paying
+	 * @param string  $companyName   Company name for who is paying
+	 * @param Address $address       Address for who is paying
+	 */
 	public function setTransportationPayment($type, $accountNumber, $personName, $companyName = null, Address $address = null)
 	{
 		$this->_transportationPaymentType        = $type;
@@ -138,11 +200,30 @@ class Shipment
 		$this->_transportationPayorCompanyName   = $companyName;
 	}
 
+	/**
+	 * Set the party responsible for paying for any duties.
+	 *
+	 * @param string $type Value from the FedEx API (SENDER, RECIPIENT etc)
+	 */
 	public function setDutiesPaymentType($type)
 	{
 		$this->_dutiesPaymentType = $type;
 	}
 
+	/**
+	 * Set the purpose for the shipment.
+	 *
+	 * Allowed values are as follows:
+	 *
+	 *  - GIFT
+	 *  - NOT_SOLD
+	 *  - PERSONAL_EFFECTS
+	 *  - REPAIR_AND_RETURN
+	 *  - SAMPLE
+	 *  - SOLD
+	 *
+	 * @param string $purpose Purpose identifer (see FedEx API docs)
+	 */
 	public function setPurpose($purpose)
 	{
 		$allowed = array(
@@ -165,6 +246,24 @@ class Shipment
 		$this->_purpose = $purpose;
 	}
 
+	/**
+	 * Set the customs option type.
+	 *
+	 * Allowed values are as follows:
+	 *
+	 * - COURTESY_RETURN_LABEL
+	 * - EXHIBITION_TRADE_SHOW
+	 * - FAULTY_ITEM
+	 * - FOLLOWING_REPAIR
+	 * - FOR_REPAIR
+	 * - ITEM_FOR_LOAN
+	 * - OTHER
+	 * - REJECTED
+	 * - REPLACEMENT
+	 * - TRIAL
+	 *
+	 * @param string $type Customs option type identifer (see FedEx API docs)
+	 */
 	public function setCustomsOptionType($type)
 	{
 		$allowed = array(
@@ -191,6 +290,13 @@ class Shipment
 		$this->_customsOptionType = $type;
 	}
 
+	/**
+	 * Enable or disable the generated commercial invoice from FedEx.
+	 *
+	 * @param  boolean $bool True to request a generated commercial invoice
+	 *
+	 * @return Shipment      Implements a fluent interface
+	 */
 	public function requestGeneratedCommercialInvoice($bool = true)
 	{
 		$this->_requestGeneratedCommercialInvoice = (bool) $bool;
@@ -198,6 +304,11 @@ class Shipment
 		return $this;
 	}
 
+	/**
+	 * Add a commodity to this shipment.
+	 *
+	 * @param Commodity $commodity
+	 */
 	public function addCommodity(Commodity $commodity)
 	{
 		if ($this->_currencyID !== $commodity->currencyID) {
@@ -211,6 +322,11 @@ class Shipment
 		$this->_commodities[] = $commodity;
 	}
 
+	/**
+	 * Clear all commodities and set them from an array.
+	 *
+	 * @param array[Commodity] $commodities
+	 */
 	public function setCommodities(array $commodities)
 	{
 		$this->_commodities = array();
@@ -220,11 +336,25 @@ class Shipment
 		}
 	}
 
+	/**
+	 * Add a document to this shipment.
+	 *
+	 * The document must have an ID set.
+	 *
+	 * @param Document $document
+	 */
 	public function addDocument(Document $document)
 	{
 		$this->_documents[] = $document;
 	}
 
+	/**
+	 * Set the shipper for this shipment.
+	 *
+	 * @param Address $address     Shipper address
+	 * @param string  $personName  Shipper person name
+	 * @param string  $companyName Shipper company name
+	 */
 	public function setShipper(Address $address, $personName, $companyName = null)
 	{
 		$this->_shipperAddress = $address;
@@ -232,6 +362,13 @@ class Shipment
 		$this->_shipperCompany = $companyName;
 	}
 
+	/**
+	 * Set the recipient for this shipment.
+	 *
+	 * @param Address $address     Recipient address
+	 * @param string  $personName  Recipient person name
+	 * @param string  $companyName Recipient company name
+	 */
 	public function setRecipient(Address $address, $personName, $companyName = null)
 	{
 		$this->_recipientAddress = $address;
@@ -239,11 +376,21 @@ class Shipment
 		$this->_recipientCompany = $companyName;
 	}
 
+	/**
+	 * Set the currency ID for this shipment
+	 *
+	 * @param string $id
+	 */
 	public function setCurrencyID($id)
 	{
 		$this->_currencyID = $id;
 	}
 
+	/**
+	 * Get the total insured value for all commodities in this shipment.
+	 *
+	 * @return float
+	 */
 	public function getInsuredValue()
 	{
 		$value = 0;
@@ -255,6 +402,11 @@ class Shipment
 		return $value;
 	}
 
+	/**
+	 * Get the total customs value for all commodities in this shipment.
+	 *
+	 * @return float
+	 */
 	public function getCustomsValue()
 	{
 		$value = 0;
@@ -266,6 +418,12 @@ class Shipment
 		return $value;
 	}
 
+	/**
+	 * Get the total weight for this shipment based on all commodities. If the
+	 * total weight is below 0.5, 0.5 is returned.
+	 *
+	 * @return float
+	 */
 	public function getWeight()
 	{
 		$weight = 0;
@@ -277,16 +435,38 @@ class Shipment
 		return $weight < 0.5 ? 0.5 : $weight;
 	}
 
+	/**
+	 * Get the FedEx currency ID. Generally this is the ISO currency code, with
+	 * the notable exception of Pounds Sterling which is "UKL" instead of "GBP"
+	 * for no good reason.
+	 *
+	 * @return string
+	 */
 	public function getFedexCurrencyID()
 	{
 		return 'GBP' === $this->_currencyID ? 'UKL' : $this->_currencyID;
 	}
 
+	public function getCompanyCurrencyID()
+	{
+		return 'GBP' === $this->_currencyID ? 'UKL' : $this->_companyCurrency;
+	}
+
+	/**
+	 * Get the recipient's address.
+	 *
+	 * @return Address|null
+	 */
 	public function getRecipientAddress()
 	{
 		return $this->_recipientAddress;
 	}
 
+	/**
+	 * Get the file extension for the label that is being requested.
+	 *
+	 * @return string
+	 */
 	public function getLabelFileExtension()
 	{
 		if ('PDF' === $this->_labelSpec['imgType']) {
@@ -300,6 +480,11 @@ class Shipment
 		return 'txt';
 	}
 
+	/**
+	 * Get the request data for this shipment.
+	 *
+	 * @return array
+	 */
 	public function getRequestData()
 	{
 		$data = array(
@@ -355,7 +540,7 @@ class Shipment
 				),
 				'CustomsValue' => array(
 					'Amount'   => $this->getCustomsValue(),
-					'Currency' => $this->getFedexCurrencyID(),
+					'Currency' => $this->getCompanyCurrencyID(),
 				),
 				'Commodities'  => array(),
 			),
@@ -374,7 +559,7 @@ class Shipment
 				),
 				'InsuredValue' => array(
 					'Amount'   => $this->getInsuredValue(),
-					'Currency' => $this->getFedexCurrencyID(),
+					'Currency' => $this->getCompanyCurrencyID(),
 				)
 			),
 			'CustomerReferences' => array(),
@@ -417,11 +602,11 @@ class Shipment
 				),
 				'CustomsValue'         => array(
 					'Amount'   => $commodity->customsValue,
-					'Currency' => $this->getFedexCurrencyID(),
+					'Currency' => $this->getCompanyCurrencyID(),
 				),
 				'InsuredValue'         => array(
 					'Amount'   => $commodity->insuredValue,
-					'Currency' => $this->getFedexCurrencyID(),
+					'Currency' => $this->getCompanyCurrencyID(),
 				)
 			);
 		}
@@ -443,7 +628,7 @@ class Shipment
 					'TermsOfSale' => $this->_termsOfSale,
 				),
 				'CustomsValue' => array(
-					'Currency' => $this->getFedexCurrencyID(),
+					'Currency' => $this->getCompanyCurrencyID(),
 					'Amount'   => $this->getCustomsValue(),
 				),
 				'Commodities'  => $data['InternationalDetail']['Commodities'],
@@ -490,6 +675,17 @@ class Shipment
 		return $data;
 	}
 
+	/**
+	 * Convert an array of address lines into an acceptable format for FedEx.
+	 *
+	 * Any falsey values are stripped, and if the array has more than 2 elements
+	 * then all elements after the first are collapsed into the second element
+	 * and an array with 2 elements is always returned.
+	 *
+	 * @param  array  $lines Address lines to convert
+	 *
+	 * @return array         Converted lines, with only 2 elements
+	 */
 	protected function _convertAddressLines(array $lines)
 	{
 		$lines = array_filter($lines);

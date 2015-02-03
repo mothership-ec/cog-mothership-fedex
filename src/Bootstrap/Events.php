@@ -13,6 +13,9 @@ use Message\Cog\Bootstrap\EventsInterface;
  */
 class Events implements EventsInterface
 {
+	/**
+	 * {@inheritDoc}
+	 */
 	public function registerEvents($dispatcher)
 	{
 		$dispatcher->addSubscriber(new Fedex\EventListener\OrderListener);

@@ -50,11 +50,21 @@ class ProcessShipment extends AbstractResponse
 		$this->_labelData    = $this->getData()->CompletedShipmentDetail->CompletedPackageDetails->Label->Parts->Image;
 	}
 
+	/**
+	 * Get the tracking code set on the response.
+	 *
+	 * @return string
+	 */
 	public function getTrackingCode()
 	{
 		return $this->_trackingCode;
 	}
 
+	/**
+	 * Get the label data returned in the response.
+	 *
+	 * @return string
+	 */
 	public function getLabelData()
 	{
 		return $this->_labelData;
