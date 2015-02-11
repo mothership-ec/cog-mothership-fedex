@@ -263,6 +263,7 @@ class Shipment
 	 * - TRIAL
 	 *
 	 * @param string $type Customs option type identifer (see FedEx API docs)
+	 * @throws \InvalidArgumentException
 	 */
 	public function setCustomsOptionType($type)
 	{
@@ -308,6 +309,7 @@ class Shipment
 	 * Add a commodity to this shipment.
 	 *
 	 * @param Commodity $commodity
+	 * @throws \InvalidArgumentException
 	 */
 	public function addCommodity(Commodity $commodity)
 	{
@@ -548,6 +550,18 @@ class Shipment
 				'LabelFormatType' => $this->_labelSpec['format'],
 				'ImageType'       => $this->_labelSpec['imgType'],
 				'LabelStockType'  => $this->_labelSpec['stockType'],
+				'CustomerSpecifiedDetail' => [
+					'CustomContent' => [
+						'BarcodeEntries' => [
+							'BarHeight' => 432,
+							'Position' => [
+								'X' => 50,
+								'Y' => 50,
+							],
+							'BarcodeSymbology' => 'PDF417',
+						],
+					]
+				],
 			),
 			'RateRequestTypes'  => array('ACCOUNT'), // valid values ACCOUNT and LIST
 			'PackageCount'      => 1,

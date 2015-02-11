@@ -23,13 +23,13 @@ class ResponseEvent extends Event
 	public function __construct(Dispatcher $dispatcher, ResponseInterface $response)
 	{
 		$this->_dispatcher = $dispatcher;
-		$this->_response    = $response;
+		$this->_response   = $response;
 	}
 
 	/**
 	 * Get the response for this event.
 	 *
-	 * @return [type] [description]
+	 * @return ResponseInterface
 	 */
 	public function getResponse()
 	{

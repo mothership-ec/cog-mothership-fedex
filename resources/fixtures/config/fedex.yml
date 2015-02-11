@@ -14,5 +14,5 @@ payment:
     type: RECIPIENT
 label:
   format: COMMON2D
-  image-type: EPL2
-  stock-type: STOCK_4X6.75_LEADING_DOC_TAB
+  image-type: PDF
+  stock-type: PAPER_7X4.75
