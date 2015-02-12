@@ -600,29 +600,35 @@ class Shipment
 
 		// Set commodities
 		foreach ($this->_commodities as $commodity) {
-			$data['InternationalDetail']['Commodities'][] = array(
+			$commodityData = [
 				'NumberOfPieces'       => $commodity->quantity,
 				'Description'          => $commodity->description,
 				'CountryOfManufacture' => $commodity->manufactureCountryID,
-				'Weight'               => array(
+				'Weight'               => [
 					'Value' => $commodity->weight / 1000,
 					'Units' => 'KG'
-				),
+				],
 				'Quantity'             => $commodity->quantity,
 				'QuantityUnits'        => 'EA',
-				'UnitPrice'            => array(
+				'UnitPrice'            => [
 					'Amount'   => $commodity->price,
 					'Currency' => $this->getFedexCurrencyID(),
-				),
-				'CustomsValue'         => array(
+				],
+				'CustomsValue'         => [
 					'Amount'   => $commodity->customsValue,
 					'Currency' => $this->getCompanyCurrencyID(),
-				),
-				'InsuredValue'         => array(
+				],
+				'InsuredValue'         => [
 					'Amount'   => $commodity->insuredValue,
 					'Currency' => $this->getCompanyCurrencyID(),
-				)
-			);
+				]
+			];
+
+			if ($harmonizedCode = $commodity->getHarmonizedCode()) {
+				$commodityData['HarmonizedCode'] = $harmonizedCode;
+			}
+
+			$data['InternationalDetail']['Commodities'][] = $commodityData;
 		}
 
 		// Add extra fields if the user wants to request a generated commercial invoice

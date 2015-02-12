@@ -21,6 +21,8 @@ class Commodity
 	public $customsValue;
 	public $insuredValue;
 
+	private $_harmonizedCode;
+
 	/**
 	 * Populate this Commodity from an order item row.
 	 *
@@ -43,7 +45,13 @@ class Commodity
 		$this->customsValue         = $row->sum('net') + $row->sum('discount'); // Ex-Tax Price (including discounts)
 		$this->price                = $this->customsValue / $this->quantity;
 		$this->insuredValue         = $product ? $product->exportValue : 0;
+		$this->_harmonizedCode      = $product ? $product->getExportCode() : null;
 
 		return $this;
+	}
+
+	public function getHarmonizedCode()
+	{
+		return $this->_harmonizedCode;
 	}
 }
