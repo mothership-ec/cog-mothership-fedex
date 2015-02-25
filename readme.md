@@ -86,14 +86,3 @@ To do so, just call `requestGeneratedCommercialInvoice(true)` on your `Shipment`
 Each service needs its own `.wsdl` file supplied by FedEx on their [developer website](http://fedex.com/developer). These are stored in `/resources/wsdl` and are referenced by their relevant service classes (instances of `Message\Mothership\Fedex\Api\Service\ServiceInterface`).
 
 The endpoints are automatically changed by the API subsystem depending on the value of the `test-mode` property on the `fedex` configuration group. The endpoint for both live and test must be set on the service class in the `getWsdlEndpoint()` method. When adding a new service or `.wsdl` file, you can get these endpoints by looking at the bottom of the file and finding the value of the `location` attribute in service->port->address. The live URI will be on the `ws.fedex.com` host and test URIs will be on the `wsbeta.fedex.com` host.
-
-## License
-
-Mothership E-Commerce
-Copyright (C) 2015 Jamie Freeman
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
