@@ -4,21 +4,7 @@ The `Message\Mothership\Fedex` cogule provides Fedex integration for dispatching
 
 ## Installation
 
-Install this package using [Composer](http://getcomposer.org/). The package name is `message/cog-mothership-fedex`.
-
-You will need to add Message's private package server to the `repositories` key in `composer.json`:
-
-	{
-		"repositories": [
-			{
-				"type": "composer",
-				"url" : "http://packages.message.co.uk"
-			}
-		],
-		"require": {
-			"message/cog-mothership-fedex": "1.0.*"
-		}
-	}
+Install this package using [Composer](http://getcomposer.org/). The package name is `mothership-ec/cog-mothership-fedex`.
 
 ## Dispatch methods
 

@@ -21,7 +21,7 @@
     }
   ],
   "support": {
-    "wiki": "http://wiki.mothership.ec",
+    "wiki": "http://wiki.mothership.ec/Fedex_module",
     "issues": "http://github.com/mothership-ec/cog-mothership-fedex/issues"
   },
   "autoload": {
