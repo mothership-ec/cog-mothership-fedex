@@ -19,7 +19,7 @@ use Message\Cog\Filesystem\File;
 class OrderListener extends BaseListener implements SubscriberInterface
 {
 	/**
-	 * {@inhericDoc}
+	 * {@inheritDoc}
 	 */
 	static public function getSubscribedEvents()
 	{
