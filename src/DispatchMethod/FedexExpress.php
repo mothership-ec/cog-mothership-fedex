@@ -32,7 +32,7 @@ class FedexExpress implements MethodInterface
 	 */
 	public function getTrackingLink($code)
 	{
-		return 'https://fedex.com/Tracking?tracknumbers=' . $code;
+		return 'https://www.fedex.com/Tracking?tracknumbers=' . $code;
 	}
 
 	/**
