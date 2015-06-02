@@ -32,7 +32,7 @@ class FedexUk implements MethodInterface
 	 */
 	public function getTrackingLink($code)
 	{
-		return 'http://www.fedexuk.net/accounts/QuickTrack.aspx?consignment=' . $code;
+		return 'https://www.fedexuk.net/accounts/QuickTrack.aspx?consignment=' . $code;
 	}
 
 	/**
